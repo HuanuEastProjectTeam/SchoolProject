@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.andriodcar.ShezhiActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        >
+        <Button
+            android:id="@+id/fanhui"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;  返回"
+            android:textSize="16sp"
+            android:background="@null"
+            android:layout_centerVertical="true"
+            />
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/xiugaimima"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="修改支付密码"
+        android:background="@color/huibaise"
+        android:gravity="center_vertical"
+        android:textColor="@color/heise"
+        android:textSize="17sp"
+        android:paddingLeft="8dp"
+        />
+    <TextView
+        android:id="@+id/wangjimima"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="忘记密码"
+        android:background="@color/huibaise"
+        android:gravity="center_vertical"
+        android:textColor="@color/heise"
+        android:textSize="17sp"
+        android:paddingLeft="8dp"
+        android:layout_marginTop="1dp"
+        />
+
+</LinearLayout>

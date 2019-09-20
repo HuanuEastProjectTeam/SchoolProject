@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.andriodcar.YonghumingActivity">
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        >
+        <Button
+            android:id="@+id/fanhui"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;  返回"
+            android:textSize="18sp"
+            android:background="@null"
+            android:layout_centerVertical="true"
+            />
+        <Button
+            android:id="@+id/quedin"
+            android:layout_height="50dp"
+            android:layout_width="wrap_content"
+            android:text="确定"
+            android:gravity="center"
+            android:textColor="@color/heise"
+            android:textSize="19sp"
+            android:background="@null"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
+    <EditText
+        android:id="@+id/shuru"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:hint="请输入新用户名"
+        />
+
+</LinearLayout>

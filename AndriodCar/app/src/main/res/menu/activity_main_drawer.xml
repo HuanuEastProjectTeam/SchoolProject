@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_person"
+            android:icon="@drawable/index_denglu"
+            android:title="登陆"
+          />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/qianbao"
+            android:title="Epark钱包" />
+
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/gerenxinxi"
+            android:title="个人信息" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/gerencar"
+            android:title="个人车位" />
+        <item
+        android:id="@+id/nav_jifen"
+        android:icon="@drawable/xinyujifen"
+        android:title="信誉积分"/>
+        <item
+            android:id="@+id/nav_lishi"
+            android:icon="@drawable/tincarlishi"
+            android:title="停车历史信息" />
+        <item
+            android:id="@+id/nav_register"
+            android:icon="@drawable/zhanghaozhuce"
+            android:title="账号注册" />
+        <item
+            android:id="@+id/nav_shezhi"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="设置"/>
+    </group>
+
+
+</menu>

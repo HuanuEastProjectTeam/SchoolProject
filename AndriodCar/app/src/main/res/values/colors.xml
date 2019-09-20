@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#98f9e7</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="white">#EEEEEE</color>
+    <color name="heise">#000</color>
+    <color name="lvse">#47f16c</color>
+    <color name="huibaise">#f3f4f0</color>
+    <color name="xiantiaose">#ece8e8</color>
+    <color name="jinmilan">#92a8d1</color>
+</resources>

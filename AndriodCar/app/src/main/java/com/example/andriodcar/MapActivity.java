@@ -4,9 +4,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -15,6 +17,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BaiduMapOptions;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
@@ -33,8 +36,14 @@ import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+    /**
+     * 地图上边的功能图标控件
+     */
+    private ImageButton imageButton_trafficSit;
+    private Boolean trafficSit_biaoZhi=true;
 
     //动态申请权限
     private static final int BAIDU_READ_PHONE_STATE = 100;
@@ -44,42 +53,38 @@ public class MapActivity extends AppCompatActivity {
      */
     private MapView mMapView = null;
 
-    private BaiduMap mBaiduMap;
 
+    private BaiduMap mBaiduMap;
+    private BaiduMapOptions baiduMapOptions;
 
     // 定位相关
     LocationClient mLocClient;
     public MyLocationListenner myListener = new MyLocationListenner();
     private MyLocationConfiguration.LocationMode mCurrentMode;
     BitmapDescriptor mCurrentMarker;
-
-
+    private MyLocationConfiguration.LocationMode locationMode;//定位模式对象
+    BitmapDescriptor bitmapDescriptor;//自定义图标对象
     boolean isFirstLoc = true;// 是否首次定位
-
+    int yan1,yan2;//精度圈颜色值
 
     //地图搜索
    private SuggestionSearch mSuggestionSearch;
    private Button btnmap;
    private EditText et;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
-        SDKInitializer.initialize(getApplicationContext());
-
-
+        SDKInitializer.initialize(getApplicationContext());//初始化百度地图sdk
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+
 
         //获取地图控件引用
         mMapView = (MapView) findViewById(R.id.bmapView);
         mBaiduMap = mMapView.getMap();
         mBaiduMap.setMyLocationEnabled(true);
-
-
-
-
-
 
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
@@ -97,7 +102,8 @@ public class MapActivity extends AppCompatActivity {
         mLocClient.registerLocationListener(myListener);
         //开启地图定位图层
         mLocClient.start();
-
+         //改变定位图标
+        myLocationConfiguration();
 
 
         //定义Maker坐标点,两个参数为湖南农业大学停车场的坐标
@@ -163,11 +169,42 @@ public class MapActivity extends AppCompatActivity {
              }
          });
 
-
+        monitorImp(this);//图层图标添加监听实现方法
 
 
     }
 
+    /**
+     * 注册监听实现方法
+     */
+    private void monitorImp(View.OnClickListener onclickListener) {
+        imageButton_trafficSit=findViewById(R.id.luKuang);//获取实况交通图标控件
+        imageButton_trafficSit.setOnClickListener(onclickListener);
+
+    }
+    //点击监听方法的实现
+    public void onClick(View view){
+        switch(view.getId()){
+            case R.id.luKuang:{//点击了实况交通图标
+                //map图层切换到实况交通图
+
+                Log.i("tuBiaoMessage","点击了切换实时路况交通图");
+                if(trafficSit_biaoZhi==true){
+                    mBaiduMap.setTrafficEnabled(true);//开启实时交通路况图
+                    trafficSit_biaoZhi=false;
+                }else{
+                    mBaiduMap.setTrafficEnabled(false);//关闭实时交通路况图
+                    trafficSit_biaoZhi=true;
+                }
+
+            }
+            /**
+             * 后面接图层右边图标触发事件类型
+             */
+
+        }
+
+    }
 
     @Override
     protected void onResume() {
@@ -200,7 +237,7 @@ public class MapActivity extends AppCompatActivity {
 
 
     /**
-     * 定位SDK监听函数
+     * 定位SDK监听函数，接受定位数据传给mapview
      */
     public class MyLocationListenner implements BDLocationListener {
 
@@ -212,7 +249,7 @@ public class MapActivity extends AppCompatActivity {
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(100).latitude(location.getLatitude())
+                    .direction(200).latitude(location.getLatitude())//200为固定的方向值
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
             if (isFirstLoc) {
@@ -235,6 +272,18 @@ public class MapActivity extends AppCompatActivity {
         public void onReceivePoi(BDLocation poiLocation) {
         }
     }
+
+    /**
+     * 自定义定位图标，精度范围实现方法
+     */
+   public void myLocationConfiguration() {
+
+       locationMode = MyLocationConfiguration.LocationMode.NORMAL;//定位为普通态
+     //  bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.zhizheng);//自定义定位图标
+       yan1 = 0xAAFFFF55;//精度圈填充颜色
+       yan2 = 0xAA11FF11;//精度圈边框颜色
+       mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(locationMode, true, bitmapDescriptor, yan1, yan2));//设置实现
+   }
 
 
 }

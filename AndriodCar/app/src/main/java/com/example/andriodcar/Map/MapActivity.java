@@ -3,10 +3,12 @@ package com.example.andriodcar.Map;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -29,15 +31,22 @@ import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 import com.example.andriodcar.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import utils.ResidentialQuarter_Bean;
+
 public class MapActivity extends AppCompatActivity implements View.OnClickListener {
 
 
+    private String LOG="tog";
     /**
      * 地图上边的功能图标控件
      */
@@ -66,12 +75,20 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     boolean isFirstLoc = true;// 是否首次定位
     private int yan1,yan2;//精度圈颜色值
     private MyOrientationListener myOrientationListener;//方向传感数据实现类
+    private float lastX;//旋转的x方向值
     //地图搜索
    private SuggestionSearch mSuggestionSearch;
    private Button btnmap;
    private EditText et;
-   private float lastX;//旋转的x方向值
 
+   //地图覆盖物
+    private List<ResidentialQuarter_Bean> longiLatiTude;//设置覆盖物的经纬度集合
+    private List<LatLng> pointMap;
+    private List<OverlayOptions> overlayOptions,overlayOptionsText;
+
+    //覆盖物事件
+    private TextView textView1;
+    private boolean textViewBiaoZhi=false;//消息框显示判断标志
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,44 +118,54 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mLocClient.registerLocationListener(myListener);
         //开启地图定位图层
         mLocClient.start();
-         //改变定位图标
+         //调用改变定位图标
         myLocationConfiguration();
         orientationLoc();//调用方向传感数据实现方法
+         //初始化集合对象
+        startArrayList();
+        //调用创建覆盖物图标方法
+        overlayMapADdd(longiLatiTude);
 
-        //定义Maker坐标点,两个参数为湖南农业大学停车场的坐标
-        LatLng point = new LatLng(28.1880748409, 113.0906765898);
-       //构建Marker图标
-        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                .fromResource(R.drawable.loc1);
-
-
-       //构建MarkerOption，用于在地图上添加Marker
-        OverlayOptions opt = new MarkerOptions()
-                .position(point)
-                .icon(bitmap);
-
-        //在地图上添加Marker，并显示
-        mBaiduMap.addOverlay(opt);
-
-
+/*
         //文字覆盖物位置坐标
         LatLng llText = new LatLng(28.1880748409, 113.0906765898);
-
         //构建TextOptions对象
         OverlayOptions mTextOptions = new TextOptions()
                 .text("停车场") //文字内容
                 .fontSize(24) //字号
                 .position(llText);
-
         //在地图上显示文字覆盖物
         Overlay mText = mBaiduMap.addOverlay(mTextOptions);
 
-        //标记点击事件
+*/
+
+
+        //覆盖物点击事件
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                /**
+                 * 点击了车库显示图标触发事件，然后显示该地区的车位使用情况
+                 */
+                    textView1=findViewById(R.id.MessageKuang);//获取信息框控件
+                    textView1.setVisibility(View.VISIBLE);//显示信息框
+                    textViewBiaoZhi=true;
+
+
+
                 Toast.makeText(MapActivity.this, "点击了", Toast.LENGTH_LONG).show();
+
                 return false;
+            }
+        });
+
+        //地图触摸事件
+        mBaiduMap.setOnMapTouchListener(new BaiduMap.OnMapTouchListener() {
+            @Override
+            public void onTouch(MotionEvent motionEvent) {
+                if(textViewBiaoZhi==true){
+                    textView1.setVisibility(View.GONE);//设置消息框消失
+                }
             }
         });
 
@@ -171,6 +198,71 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         monitorImp(this);//图层图标添加监听实现方法
 
 
+    }
+
+    /**
+     * 初始化集合对象
+     */
+    private void startArrayList() {
+        Log.i(LOG,"进入集合初始化");
+        longiLatiTude=new ArrayList<ResidentialQuarter_Bean>();//初始化小区对象集合
+        pointMap=new ArrayList<LatLng>();
+        overlayOptions=new ArrayList<OverlayOptions>();
+        overlayOptionsText=new ArrayList<OverlayOptions>();
+    }
+
+
+    /**
+     * 覆盖物小区图标实现方法
+     * @param longiLatiTude 各小区转换对象集合
+     */
+    private void overlayMapADdd(List<ResidentialQuarter_Bean> longiLatiTude) {
+
+        //创建Maker坐标点
+        LatLng point;
+        OverlayOptions options,options1Text;//创建覆盖物对象
+
+/******************************测试数据*************************************************************/
+        ResidentialQuarter_Bean s1=new ResidentialQuarter_Bean();
+        s1.setLongitude(28.18934);
+        s1.setLatitude(113.088875);
+        longiLatiTude.add(s1);
+        ResidentialQuarter_Bean s2=new ResidentialQuarter_Bean();
+        s2.setLongitude(28.189658);
+        s2.setLatitude(113.090564);
+        longiLatiTude.add(s2);
+        ResidentialQuarter_Bean s3=new ResidentialQuarter_Bean();
+        s3.setLongitude(28.188895);
+        s3.setLatitude(113.093486);
+        longiLatiTude.add(s3);
+
+   /***************************************************************************************/
+
+        Log.i(LOG,"进入覆盖物创建方法");
+        for(int i=0;i<longiLatiTude.size();i++){
+            point=new LatLng(longiLatiTude.get(i).getLongitude(),longiLatiTude.get(i).getLatitude());//参数1，2为经纬度，创建坐标点
+            pointMap.add(point);//添加到坐标点集合
+            Log.i(LOG,"添加坐标集合"+longiLatiTude.get(i).getLongitude());
+        }
+        BitmapDescriptor bitmapDescriptor=BitmapDescriptorFactory
+                .fromResource(R.drawable.loc1);//创建Marker图标
+        for(int i=0;i<pointMap.size();i++){
+          //构建MarkOption,可以作为地图上添加Marker
+            options=new MarkerOptions()
+                    .position(pointMap.get(i))
+                    .icon(bitmapDescriptor);
+            //构建文本覆盖物
+            options1Text=new TextOptions()
+                    .position(pointMap.get(i))
+                    .text("停车场")
+                    .fontSize(24);
+            //加入overlayOptions集合
+            overlayOptions.add(options);
+            overlayOptionsText.add(options1Text);
+            Log.i(LOG,"添加覆盖物集合");
+        }
+        mBaiduMap.addOverlays(overlayOptions);//在地图上添加marker,显示出来
+        mBaiduMap.addOverlays(overlayOptionsText);//添加
     }
 
     /**

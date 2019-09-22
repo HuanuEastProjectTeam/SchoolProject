@@ -79,7 +79,7 @@
         <activity android:name=".MessageActivity" />
         <activity android:name=".CarActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".MapActivity" />
+        <activity android:name=".Map.MapActivity" />
         <activity android:name=".ShezhiActivity" />
         <activity android:name=".YonghumingActivity" />
         <activity android:name=".OpenLack" />

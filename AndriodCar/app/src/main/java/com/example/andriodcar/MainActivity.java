@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
+import com.example.andriodcar.Map.MapActivity;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
 import com.facebook.drawee.drawable.ScalingUtils;
@@ -46,8 +47,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
-
-import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -179,7 +178,7 @@ public class MainActivity extends AppCompatActivity
         btn_carmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(MainActivity.this,MapActivity.class);
+                Intent intent=new Intent(MainActivity.this, MapActivity.class);
                 startActivity(intent);
             }
         });

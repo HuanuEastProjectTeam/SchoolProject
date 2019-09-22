@@ -1,7 +1,5 @@
-package com.example.andriodcar;
+package com.example.andriodcar.Map;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +33,7 @@ import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.example.andriodcar.R;
 
 public class MapActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -65,13 +64,13 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private MyLocationConfiguration.LocationMode locationMode;//定位模式对象
     BitmapDescriptor bitmapDescriptor;//自定义图标对象
     boolean isFirstLoc = true;// 是否首次定位
-    int yan1,yan2;//精度圈颜色值
-
+    private int yan1,yan2;//精度圈颜色值
+    private MyOrientationListener myOrientationListener;//方向传感数据实现类
     //地图搜索
    private SuggestionSearch mSuggestionSearch;
    private Button btnmap;
    private EditText et;
-
+   private float lastX;//旋转的x方向值
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +103,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mLocClient.start();
          //改变定位图标
         myLocationConfiguration();
-
+        orientationLoc();//调用方向传感数据实现方法
 
         //定义Maker坐标点,两个参数为湖南农业大学停车场的坐标
         LatLng point = new LatLng(28.1880748409, 113.0906765898);
@@ -249,7 +248,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(200).latitude(location.getLatitude())//200为固定的方向值
+                    .direction(lastX).latitude(location.getLatitude())//lastX为旋转的方向值
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
             if (isFirstLoc) {
@@ -285,5 +284,20 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
        mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(locationMode, true, bitmapDescriptor, yan1, yan2));//设置实现
    }
 
+    /**
+     * 随定位图标随方向旋转方法实现
+     */
+    public void orientationLoc(){
+        //调用方向传感器数据实现类构建对象
+        Log.i("dd","开始调用方向传感数据实现方法");
+        myOrientationListener=new MyOrientationListener(this);
+        myOrientationListener.setOnOrientationListener(new MyOrientationListener.OnOrientationListener() {
+            @Override
+            public void onOrientationChanged(float x) {
+                lastX=x;//x旋转方向值赋值给全局变量
+                Log.i("dd",""+lastX);
+            }
+        });
+    }
 
 }

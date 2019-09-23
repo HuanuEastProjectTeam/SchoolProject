@@ -56,20 +56,26 @@
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/MessageQu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:layout_alignParentBottom="true"
+            android:background="@color/huibaise"
             >
 
             <TextView
                 android:id="@+id/MessageKuang"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="60dp"
                 android:text="湖南农业大学图书馆停车场"
                 android:textSize="20sp"
-                android:gravity="center"
-                android:visibility="gone"
-                android:background="@color/huibaise"
+                />
+            <TextView
+                android:id="@+id/carNum"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:text="剩余空闲车位：66个"
+                android:textSize="20sp"
+                android:layout_below="@+id/MessageKuang"
                 />
         </RelativeLayout>
     </RelativeLayout>

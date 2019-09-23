@@ -1,4 +1,4 @@
-package utils;
+package com.example.andriodcar.Bean;
 
 /**
  * 小区数据接受对象转换实现类

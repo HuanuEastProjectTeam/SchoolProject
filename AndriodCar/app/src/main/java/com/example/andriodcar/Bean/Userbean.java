@@ -1,4 +1,4 @@
-package utils;
+package com.example.andriodcar.Bean;
 
 
 public class Userbean {

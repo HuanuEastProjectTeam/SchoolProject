@@ -1,5 +1,6 @@
 package com.example.andriodcar.Map;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,11 +29,9 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
@@ -41,7 +41,7 @@ import com.example.andriodcar.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.ResidentialQuarter_Bean;
+import com.example.andriodcar.Bean.ResidentialQuarter_Bean;
 
 public class MapActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -87,8 +87,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private List<OverlayOptions> overlayOptions,overlayOptionsText;
 
     //覆盖物事件
-    private TextView textView1;
+    private TextView textView_Name,textView_Num;
     private boolean textViewBiaoZhi=false;//消息框显示判断标志
+    private RelativeLayout messageLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,20 +125,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
          //初始化集合对象
         startArrayList();
         //调用创建覆盖物图标方法
-        overlayMapADdd(longiLatiTude);
+        overlayMapADdd(longiLatiTude);//longiLatiTude为小区地图覆盖物对象的集合对象
 
-/*
-        //文字覆盖物位置坐标
-        LatLng llText = new LatLng(28.1880748409, 113.0906765898);
-        //构建TextOptions对象
-        OverlayOptions mTextOptions = new TextOptions()
-                .text("停车场") //文字内容
-                .fontSize(24) //字号
-                .position(llText);
-        //在地图上显示文字覆盖物
-        Overlay mText = mBaiduMap.addOverlay(mTextOptions);
 
-*/
 
 
         //覆盖物点击事件
@@ -147,13 +137,34 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 /**
                  * 点击了车库显示图标触发事件，然后显示该地区的车位使用情况
                  */
-                    textView1=findViewById(R.id.MessageKuang);//获取信息框控件
-                    textView1.setVisibility(View.VISIBLE);//显示信息框
-                    textViewBiaoZhi=true;
+
+                Bundle bundle=marker.getExtraInfo();//获取携带的信息对象
+                int id=bundle.getInt("id");//获取覆盖物对应id
+                Log.i(LOG,""+id);
+                for(int i=0;i<longiLatiTude.size();i++){
+                    if(id==longiLatiTude.get(i).getId()){
+                        messageLayout=findViewById(R.id.MessageQu);
+                        textView_Name=findViewById(R.id.MessageKuang);//获取信息框控件
+                        textView_Num=findViewById(R.id.carNum);//获取车位余数控件
+                        textView_Num.setText("剩余空闲车位："+longiLatiTude.get(i).getTotalNumPaks()+"个");//显示余数
+                        textView_Name.setText(longiLatiTude.get(i).getCommunityName()+longiLatiTude.get(i).getCommunityAddress());//显示小区名字地址
+                        messageLayout.setVisibility(View.VISIBLE);//显示信息框
+                        textViewBiaoZhi=true;
+                        textView_Name.setOnClickListener(new View.OnClickListener() {//设置信息框的点击事件
+                            @Override
+                            public void onClick(View view) {
+                                /**
+                                 * 出现导航，指引用户前往地点
+                                 */
 
 
+                            }
+                        });
+                    }
+                }
 
-                Toast.makeText(MapActivity.this, "点击了", Toast.LENGTH_LONG).show();
+
+              //  Toast.makeText(MapActivity.this, "点击了", Toast.LENGTH_LONG).show();
 
                 return false;
             }
@@ -164,7 +175,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onTouch(MotionEvent motionEvent) {
                 if(textViewBiaoZhi==true){
-                    textView1.setVisibility(View.GONE);//设置消息框消失
+                    messageLayout.setVisibility(View.GONE);//设置消息框消失
                 }
             }
         });
@@ -226,17 +237,37 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         ResidentialQuarter_Bean s1=new ResidentialQuarter_Bean();
         s1.setLongitude(28.18934);
         s1.setLatitude(113.088875);
+        s1.setCommunityName("天霸地霸小区");
+        s1.setCommunityAddress("天王路一号");
+        s1.setId(1);
         longiLatiTude.add(s1);
         ResidentialQuarter_Bean s2=new ResidentialQuarter_Bean();
         s2.setLongitude(28.189658);
         s2.setLatitude(113.090564);
+        s2.setCommunityName("舞蹈小区");
+        s2.setCommunityAddress("蛇皮路二号");
+        s2.setId(2);
         longiLatiTude.add(s2);
         ResidentialQuarter_Bean s3=new ResidentialQuarter_Bean();
         s3.setLongitude(28.188895);
         s3.setLatitude(113.093486);
+        s3.setCommunityName("天天小区");
+        s3.setCommunityAddress("鄂武商路三号");
+        s3.setId(3);
         longiLatiTude.add(s3);
 
    /***************************************************************************************/
+
+
+   /*************************************添加接收的小区对象到集合****************************************************/
+        /**
+         *
+         *
+         *
+         *
+         *
+         *
+         */
 
         Log.i(LOG,"进入覆盖物创建方法");
         for(int i=0;i<longiLatiTude.size();i++){
@@ -246,10 +277,14 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         }
         BitmapDescriptor bitmapDescriptor=BitmapDescriptorFactory
                 .fromResource(R.drawable.loc1);//创建Marker图标
+        Bundle mBundle;//创建携带对象
         for(int i=0;i<pointMap.size();i++){
           //构建MarkOption,可以作为地图上添加Marker
+            mBundle=new Bundle();
+            mBundle.putInt("id",longiLatiTude.get(i).getId());//给bundle添加信息
             options=new MarkerOptions()
                     .position(pointMap.get(i))
+                    .extraInfo(mBundle)//携带id信息便于点击事件的区分
                     .icon(bitmapDescriptor);
             //构建文本覆盖物
             options1Text=new TextOptions()

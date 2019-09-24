@@ -36,12 +36,14 @@ import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.example.andriodcar.MainActivity;
 import com.example.andriodcar.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.andriodcar.Bean.ResidentialQuarter_Bean;
+import com.example.andriodcar.ShezhiActivity;
 
 public class MapActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -80,6 +82,8 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
    private SuggestionSearch mSuggestionSearch;
    private Button btnmap;
    private EditText et;
+   private String location=null;//获取输入数据
+   private List<SuggestionResult.SuggestionInfo> searchResult=new ArrayList<SuggestionResult.SuggestionInfo>();//搜索结果集合
 
    //地图覆盖物
     private List<ResidentialQuarter_Bean> longiLatiTude;//设置覆盖物的经纬度集合
@@ -184,25 +188,13 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
          mSuggestionSearch = SuggestionSearch.newInstance();
          btnmap=findViewById(R.id.btn_map);
          et=findViewById(R.id.et_map);
-         btnmap.setOnClickListener(new View.OnClickListener() {
+         et.setOnClickListener(new View.OnClickListener() {//给输入框设置点击事件跳转到新的activity处理搜索结果
              @Override
              public void onClick(View view) {
-                String location=et.getText().toString();
-                 //创建Sug检索监听器
-                 mSuggestionSearch.setOnGetSuggestionResultListener(new OnGetSuggestionResultListener() {
-                     @Override
-                     public void onGetSuggestionResult(SuggestionResult suggestionResult) {
-                         //处理检索结果
-
-                     }
-                 });
-                 /**
-                  * 在您的项目中，keyword为随您的输入变化的值
-                  */
-                 mSuggestionSearch.requestSuggestion(new SuggestionSearchOption()
-                         .city("长沙")
-                         .keyword(location));
-
+                 Log.i(LOG,"搜索框点击效果，准备跳转");
+               //  searchResultDeal();//调用搜索结果处理方法,返回结果,不能直接这样调用
+                 Intent intent=new Intent(MapActivity.this, SuggesitionSearchResultActivity.class);
+                 startActivity(intent);//跳转
              }
          });
 
@@ -210,6 +202,37 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
 
     }
+
+    /**
+     *  搜索结果处理方法
+     * @return 返回搜索结果
+     */
+    public List<SuggestionResult.SuggestionInfo> searchResultDeal() {
+        location=et.getText().toString();
+        Log.i(LOG,"输入的搜索结果："+location);
+        //创建Sug检索监听器
+        mSuggestionSearch.setOnGetSuggestionResultListener(new OnGetSuggestionResultListener() {
+            @Override
+            public void onGetSuggestionResult(SuggestionResult suggestionResult) {
+                //处理检索结果
+                searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集
+                for(int i=0;i<=searchResult.size();i++){
+                    Log.i(LOG,"结果："+searchResult.get(i));
+
+                }
+
+            }
+        });
+        /**
+         * 在您的项目中，keyword为随您的输入变化的值
+         */
+        mSuggestionSearch.requestSuggestion(new SuggestionSearchOption()
+                .city("长沙")
+                .keyword(location));
+        return searchResult;
+    }
+
+
 
     /**
      * 初始化集合对象
@@ -356,7 +379,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mBaiduMap.setMyLocationEnabled(false);
         mMapView.onDestroy();
         mMapView = null;
-
+        myOrientationListener.stop();//关闭传感器
 
         super.onDestroy();
     }

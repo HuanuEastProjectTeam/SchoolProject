@@ -3,12 +3,16 @@ package com.example.andriodcar.Map;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Layout;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +87,8 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
    private Button btnmap;
    private EditText et;
    private String location=null;//获取输入数据
-   private List<SuggestionResult.SuggestionInfo> searchResult=new ArrayList<SuggestionResult.SuggestionInfo>();//搜索结果集合
+   private List<SuggestionResult.SuggestionInfo> searchResult;
+   private LinearLayout layout;//搜索视图
 
    //地图覆盖物
     private List<ResidentialQuarter_Bean> longiLatiTude;//设置覆盖物的经纬度集合
@@ -186,20 +191,64 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
         //创建Sug检索实例
          mSuggestionSearch = SuggestionSearch.newInstance();
-         btnmap=findViewById(R.id.btn_map);
-         et=findViewById(R.id.et_map);
+       //  btnmap=findViewById(R.id.btn_map);
+         et=findViewById(R.id.search);
          et.setOnClickListener(new View.OnClickListener() {//给输入框设置点击事件跳转到新的activity处理搜索结果
              @Override
              public void onClick(View view) {
                  Log.i(LOG,"搜索框点击效果，准备跳转");
                //  searchResultDeal();//调用搜索结果处理方法,返回结果,不能直接这样调用
-                 Intent intent=new Intent(MapActivity.this, SuggesitionSearchResultActivity.class);
-                 startActivity(intent);//跳转
+                 layout=findViewById(R.id.layout);//获取视图控件
+                 layout.setVisibility(View.VISIBLE);//设置显示
+                 et.setFocusable(true);
+                 et.setFocusableInTouchMode(true);
+
              }
          });
 
         monitorImp(this);//图层图标添加监听实现方法
+        et.setOnFocusChangeListener(new View.OnFocusChangeListener() {//设置获取焦点触发方法
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                final EditText editText=(EditText)view;//获取焦点变化视图控件
+                if(b){
+                    Log.i(LOG,"焦点事件触发");
 
+                    editText.addTextChangedListener(new TextWatcher() {//获取焦点后添加文本变化监听事件
+                        @Override
+                        //输入前的监听方法
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        //输入文本变化的监听方法,
+                        // charSequence  输入框中改变前的字符串信息
+                        // i 输入框中改变前的字符串的起始位置
+                        // i1 输入框中改变前后的字符串改变数量一般为0
+                        // i2 输入框中改变后的字符串与起始位置的偏移量
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            new Thread(new Runnable() {//开启一个线程，进行搜索查询
+                                @Override
+                                public void run() {
+                                    searchResultDeal(editText);//调用搜索结果处理方法
+                                }
+                            }).start();
+
+                            Log.i("gg","文本改变监听方法开始调用");
+                        }
+
+                        @Override
+                        //输入后的监听
+                        public void afterTextChanged(Editable editable) {
+
+                        }
+                    });
+                }else{
+                    editText.setHint("搜索");
+                }
+            }
+        });
 
     }
 
@@ -207,28 +256,35 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
      *  搜索结果处理方法
      * @return 返回搜索结果
      */
-    public List<SuggestionResult.SuggestionInfo> searchResultDeal() {
+    public List<SuggestionResult.SuggestionInfo> searchResultDeal(EditText et) {
+
         location=et.getText().toString();
-        Log.i(LOG,"输入的搜索结果："+location);
-        //创建Sug检索监听器
-        mSuggestionSearch.setOnGetSuggestionResultListener(new OnGetSuggestionResultListener() {
-            @Override
-            public void onGetSuggestionResult(SuggestionResult suggestionResult) {
-                //处理检索结果
-                searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集
-                for(int i=0;i<=searchResult.size();i++){
-                    Log.i(LOG,"结果："+searchResult.get(i));
+        Log.i(LOG,"准备检索");
+        if(!location.equals("")){
+            Log.i(LOG,"开始检索");
+            mSuggestionSearch.setOnGetSuggestionResultListener(new OnGetSuggestionResultListener() {
+                @Override
+                public void onGetSuggestionResult(SuggestionResult suggestionResult) {
+                    //处理检索结果
+                    searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集
+                    for(int i=0;i<searchResult.size();i++){
+                        Log.i("gg","结果："+searchResult.get(i));
+
+                    }
 
                 }
+            });
+            Log.i(LOG,"输入的搜索结果："+location);
+            //创建Sug检索监听器
 
-            }
-        });
-        /**
-         * 在您的项目中，keyword为随您的输入变化的值
-         */
-        mSuggestionSearch.requestSuggestion(new SuggestionSearchOption()
-                .city("长沙")
-                .keyword(location));
+            /**
+             * 在您的项目中，keyword为随您的输入变化的值
+             */
+            mSuggestionSearch.requestSuggestion(new SuggestionSearchOption()
+                    .city("长沙")
+                    .keyword(location));
+        }
+
         return searchResult;
     }
 
@@ -243,6 +299,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         pointMap=new ArrayList<LatLng>();
         overlayOptions=new ArrayList<OverlayOptions>();
         overlayOptionsText=new ArrayList<OverlayOptions>();
+        searchResult=new ArrayList<SuggestionResult.SuggestionInfo>();//搜索结果集合
     }
 
 
@@ -380,7 +437,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mMapView.onDestroy();
         mMapView = null;
         myOrientationListener.stop();//关闭传感器
-
+        mSuggestionSearch.destroy();
         super.onDestroy();
     }
 

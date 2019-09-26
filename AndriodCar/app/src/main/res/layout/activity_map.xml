@@ -6,43 +6,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Map.MapActivity">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        android:layout_weight="1"
-        >
-        <EditText
-            android:id="@+id/et_map"
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:hint="输入地点...."
-            />
-        <Button
-            android:id="@+id/btn_map"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="确定"
-            />
-
-    </LinearLayout>
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
         >
+
         <com.baidu.mapapi.map.MapView
             android:id="@+id/bmapView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true" />
+        <EditText
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:hint="搜索"
+            android:paddingLeft="40dp"
+            android:focusable="false"
+
+            android:background="@drawable/search_border"
+            android:drawableRight="@drawable/qianbao"
+            />
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tuBiaoQu"
+            android:layout_marginTop="20dp"
             >
 
             <ImageButton
@@ -55,6 +47,7 @@
 
                 />
         </RelativeLayout>
+        <include layout="@layout/activity_suggesition_search_result"/>
         <RelativeLayout
             android:id="@+id/MessageQu"
             android:layout_width="match_parent"

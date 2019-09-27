@@ -1,6 +1,8 @@
 package com.example.andriodcar.Map;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -9,10 +11,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,12 +89,16 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private MyOrientationListener myOrientationListener;//方向传感数据实现类
     private float lastX;//旋转的x方向值
     //地图搜索
-   private SuggestionSearch mSuggestionSearch;
-   private Button btnmap;
-   private EditText et;
-   private String location=null;//获取输入数据
-   private List<SuggestionResult.SuggestionInfo> searchResult;
-   private LinearLayout layout;//搜索视图
+    private SuggestionSearch mSuggestionSearch;
+    private EditText et;
+    private String location=null;//获取输入数据
+    private List<SuggestionResult.SuggestionInfo> searchResult;
+    private LinearLayout layout;//搜索视图
+    private ListView listView;//视图列表对象
+    private ArrayAdapter arrayAdapter;//创建适配器对象
+    private List<String>list;//适配器数据源
+    private boolean kong=true;
+
 
    //地图覆盖物
     private List<ResidentialQuarter_Bean> longiLatiTude;//设置覆盖物的经纬度集合
@@ -100,11 +110,14 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private boolean textViewBiaoZhi=false;//消息框显示判断标志
     private RelativeLayout messageLayout;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         SDKInitializer.initialize(getApplicationContext());//初始化百度地图sdk
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+
+
+
 
 
         //获取地图控件引用
@@ -228,12 +241,11 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                         // i1 输入框中改变前后的字符串改变数量一般为0
                         // i2 输入框中改变后的字符串与起始位置的偏移量
                         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            new Thread(new Runnable() {//开启一个线程，进行搜索查询
-                                @Override
-                                public void run() {
                                     searchResultDeal(editText);//调用搜索结果处理方法
-                                }
-                            }).start();
+
+
+
+
 
                             Log.i("gg","文本改变监听方法开始调用");
                         }
@@ -254,10 +266,10 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     /**
      *  搜索结果处理方法
-     * @return 返回搜索结果
+     *
      */
-    public List<SuggestionResult.SuggestionInfo> searchResultDeal(EditText et) {
-
+    public void searchResultDeal(EditText et) {
+        List<SuggestionResult.SuggestionInfo> jieGuo=new ArrayList<SuggestionResult.SuggestionInfo>();
         location=et.getText().toString();
         Log.i(LOG,"准备检索");
         if(!location.equals("")){
@@ -267,10 +279,25 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 public void onGetSuggestionResult(SuggestionResult suggestionResult) {
                     //处理检索结果
                     searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集
-                    for(int i=0;i<searchResult.size();i++){
-                        Log.i("gg","结果："+searchResult.get(i));
+                    for(int a=0;a<searchResult.size();a++){
+                        Log.i("gg","结果："+searchResult.get(a));
+                        String address[]=new String[searchResult.size()];//创建搜索结果地址
+                        String uid[]=new String[searchResult.size()];//创建搜索结果的指定uid
+                        String key[]=new String[searchResult.size()];//常见搜索结果的key
+                        String district[]=new String[searchResult.size()];//搜索结果的地区
+                        String city[]=new String[searchResult.size()];//搜索结果的城市
+                        //   Log.e("gg",searchResult.get(0)+"测试");
+                        Log.e("gg","测试："+searchResult.get(a));
+                        address[a]=searchResult.get(a).getAddress();
+                        uid[a]=searchResult.get(a).getUid();
+                        key[a]=searchResult.get(a).getKey();
+                        district[a]=searchResult.get(a).getDistrict();
+                        city[a]=searchResult.get(a).getCity();
+                        list.add(key[a]+city[a]+district[a]);
+
 
                     }
+                    itemListViewAdd(kong,list);//调用视图列表显示搜索结果方法
 
                 }
             });
@@ -283,11 +310,36 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
             mSuggestionSearch.requestSuggestion(new SuggestionSearchOption()
                     .city("长沙")
                     .keyword(location));
+
+        }else{
+            kong=false;
+            itemListViewAdd(kong,list);//调用视图列表显示搜索结果方法,第一个参数是判断标志
+            kong=true;
         }
 
-        return searchResult;
+
     }
 
+    /**
+     * 视图列表添加信息方法
+     */
+    private void itemListViewAdd(boolean kong,List<String>list) {
+        if(kong){
+            listView=findViewById(R.id.listview);
+            arrayAdapter=new ArrayAdapter(getApplicationContext(),android.R.layout.simple_list_item_1,list);
+            listView.setAdapter(arrayAdapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {//搜索结果点击事件触发
+                    Toast.makeText(getApplicationContext(),"点击了",Toast.LENGTH_LONG).show();
+                }
+            });
+        }else{
+
+            list.removeAll(list);
+        }
+
+    }
 
 
     /**
@@ -300,6 +352,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         overlayOptions=new ArrayList<OverlayOptions>();
         overlayOptionsText=new ArrayList<OverlayOptions>();
         searchResult=new ArrayList<SuggestionResult.SuggestionInfo>();//搜索结果集合
+        list=new ArrayList<String>();
     }
 
 

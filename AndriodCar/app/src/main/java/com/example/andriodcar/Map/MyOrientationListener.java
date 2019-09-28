@@ -9,6 +9,9 @@ import android.util.Log;
 
 import java.text.AttributedCharacterIterator;
 
+/**
+ * 方向传感器实现类
+ */
 public class MyOrientationListener implements SensorEventListener {
 
 

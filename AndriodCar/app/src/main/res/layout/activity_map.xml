@@ -17,18 +17,34 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true" />
-        <EditText
-            android:id="@+id/search"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:hint="搜索"
-            android:paddingLeft="40dp"
-            android:focusable="false"
+            android:layout_height="wrap_content"
+            >
 
-            android:background="@drawable/search_border"
-            android:drawableRight="@drawable/qianbao"
-            />
+            <EditText
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:hint="搜索"
+                android:drawablePadding="20dp"
+                android:paddingLeft="60dp"
+                android:focusable="false"
+                android:background="@drawable/search_border"
+                android:drawableRight="@drawable/qianbao"
+                />
+            <ImageButton
+                android:id="@+id/imagebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/qianbao"
+                android:background="@null"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                />
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:layout_width="wrap_content"

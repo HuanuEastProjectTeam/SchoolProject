@@ -9,8 +9,10 @@ import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,6 +44,17 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
+import com.baidu.mapapi.search.route.BikingRouteResult;
+import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
+import com.baidu.mapapi.search.route.DrivingRouteResult;
+import com.baidu.mapapi.search.route.IndoorRouteResult;
+import com.baidu.mapapi.search.route.MassTransitRouteResult;
+import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
+import com.baidu.mapapi.search.route.PlanNode;
+import com.baidu.mapapi.search.route.RoutePlanSearch;
+import com.baidu.mapapi.search.route.TransitRouteResult;
+import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
@@ -64,6 +77,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
      */
     private ImageButton imageButton_trafficSit;
     private Boolean trafficSit_biaoZhi=true;
+
+    //导航线路规划
+    private RoutePlanSearch routePlanSearch;//路线检索对象
 
     //动态申请权限
     private static final int BAIDU_READ_PHONE_STATE = 100;
@@ -227,29 +243,57 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 if(b){
                     Log.i(LOG,"焦点事件触发");
 
-                    editText.addTextChangedListener(new TextWatcher() {//获取焦点后添加文本变化监听事件
+
+                    //给搜索框添加软键盘监听事件
+                    //也可以使用setOnEditorActionListener();
+                    editText.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                            if(i==KeyEvent.KEYCODE_ENTER &&KeyEvent.ACTION_DOWN==keyEvent.getAction()){
+                                //点击回车键后执行的操作
+                                if(editText.getText().toString().equals("")){//回车键之前判断文本为空，提示输入
+                                    Toast.makeText(getApplicationContext(),"请输入地址",Toast.LENGTH_SHORT);
+                                }else {
+                                    //进入导航线路规划
+                                    Log.i("gg","软键盘回车键监测成功，准备调用驾车路线规划方法");
+                                    routePlanCar();//调用驾车路线规划实现方法
+                                    layout.setVisibility(View.GONE);//隐藏listView的布局
+
+                                }
+                            }
+
+                            return true;//返回真，消费本次触发，只触发一次事件,否则ActionDown、ActionUp都会回调到这里，不作处理的话就会调用两次
+
+                        }
+                    });
+
+
+                    //获取焦点后添加文本变化监听事件
+                    editText.addTextChangedListener(new TextWatcher() {
+                        String yuanString;
                         @Override
                         //输入前的监听方法
                         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
                         }
-
                         @Override
                         //输入文本变化的监听方法,
-                        // charSequence  输入框中改变前的字符串信息
+                        // charSequence  输入框中改变后的字符串信息
                         // i 输入框中改变前的字符串的起始位置
                         // i1 输入框中改变前后的字符串改变数量一般为0
                         // i2 输入框中改变后的字符串与起始位置的偏移量
                         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                    searchResultDeal(editText);//调用搜索结果处理方法
 
+                            if(charSequence.toString().trim().equals(yuanString)){//判断改变是否有空格
+                                   Log.i("Log","输入内容未改变，不做处理");
+                            }else{
 
+                                searchResultDeal(editText);//调用搜索结果处理方法
 
-
+                            }
 
                             Log.i("gg","文本改变监听方法开始调用");
+                            yuanString=charSequence.toString();//赋值给比较变量
                         }
-
                         @Override
                         //输入后的监听
                         public void afterTextChanged(Editable editable) {
@@ -265,12 +309,82 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     /**
+     * 驾车导航路线规划
+     */
+    private void routePlanCar() {
+        Log.i("gg","调用路线规划方法成功");
+        routePlanSearch=RoutePlanSearch.newInstance();//实例化路线检索对象
+        //设置检索结果监听器
+        routePlanSearch.setOnGetRoutePlanResultListener(new OnGetRoutePlanResultListener() {
+            @Override
+            //步行路线检索结果处理方法
+            public void onGetWalkingRouteResult(WalkingRouteResult walkingRouteResult) {
+
+            }
+
+            @Override
+            //市内公交路线检索结果处理方法
+            public void onGetTransitRouteResult(TransitRouteResult transitRouteResult) {
+
+            }
+
+            @Override
+            //跨城公交路线规划结果处理方法
+            public void onGetMassTransitRouteResult(MassTransitRouteResult massTransitRouteResult) {
+
+            }
+
+            @Override
+            //驾车路线规划检索结果处理方法
+            public void onGetDrivingRouteResult(DrivingRouteResult drivingRouteResult) {
+                Log.i("gg","驾车路线规划开启");
+                //创建DrivingRouteOverlay实例
+                DrivingRouteOverlay overlay=new DrivingRouteOverlay(mBaiduMap);
+                if(drivingRouteResult.getRouteLines().size()>0){
+                    //获取路径规划数据
+                    overlay.setData(drivingRouteResult.getRouteLines().get(0));//获取第一条路线规划
+                    overlay.addToMap();//在地图上绘制规划路线
+                }
+
+
+            }
+
+            @Override
+            //室内路线规划结果处理方法
+            public void onGetIndoorRouteResult(IndoorRouteResult indoorRouteResult) {
+
+            }
+
+            @Override
+            //骑行路线规划检索结果处理方法
+            public void onGetBikingRouteResult(BikingRouteResult bikingRouteResult) {
+
+            }
+        });
+
+
+        //创建一个起点和终点数据对象
+        /**
+         * 后续写出起点终点的变量
+         */
+        PlanNode stNode=PlanNode.withCityNameAndPlaceName("长沙","湖南农业大学西门");
+        PlanNode enNode=PlanNode.withCityNameAndPlaceName("长沙","长沙火车站");
+
+
+        routePlanSearch.drivingSearch(new DrivingRoutePlanOption()
+                .from(stNode)
+                .to(enNode)
+        );
+
+    }
+
+    /**
      *  搜索结果处理方法
      *
      */
     public void searchResultDeal(EditText et) {
         List<SuggestionResult.SuggestionInfo> jieGuo=new ArrayList<SuggestionResult.SuggestionInfo>();
-        location=et.getText().toString();
+        location=et.getText().toString().trim();
         Log.i(LOG,"准备检索");
         if(!location.equals("")){
             Log.i(LOG,"开始检索");
@@ -278,7 +392,10 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onGetSuggestionResult(SuggestionResult suggestionResult) {
                     //处理检索结果
-                    searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集
+                    searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集、
+                    if(list.size()>0){
+                        list.removeAll(list);//清除原本数据
+                    }
                     for(int a=0;a<searchResult.size();a++){
                         Log.i("gg","结果："+searchResult.get(a));
                         String address[]=new String[searchResult.size()];//创建搜索结果地址
@@ -293,9 +410,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                         key[a]=searchResult.get(a).getKey();
                         district[a]=searchResult.get(a).getDistrict();
                         city[a]=searchResult.get(a).getCity();
-                        list.add(key[a]+city[a]+district[a]);
-
-
+                        list.add(key[a]+"-"+city[a]+district[a]);
                     }
                     itemListViewAdd(kong,list);//调用视图列表显示搜索结果方法
 
@@ -332,6 +447,10 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {//搜索结果点击事件触发
                     Toast.makeText(getApplicationContext(),"点击了",Toast.LENGTH_LONG).show();
+                    /**
+                     * 调用路线规划方法处理点击的事件，并且获取点击的搜索目的地,后续传入目的地参数
+                     */
+                    routePlanCar();
                 }
             });
         }else{
@@ -491,6 +610,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mMapView = null;
         myOrientationListener.stop();//关闭传感器
         mSuggestionSearch.destroy();
+        routePlanSearch.destroy();//释放检索实例
         super.onDestroy();
     }
 

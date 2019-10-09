@@ -9,4 +9,32 @@
     <string name="qianbao_zichan">Epark钱包</string>
     <string name="fanhui">返回</string>
     <string name="tijiao">提交</string>
+
+
+    <!--支付宝支付所需的String常量-->
+    <string name="APPID">2016101300678068</string>
+    <string name="ALIPAY_PUBLIC_KEY">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhxGVtWXZP4ErpCdNJYxzYvKmbn7R91n/CXMSDEqRGfocWKROJHyvpmTO1dcwMuvvKjHZzh7W3hPr/dkKVwjns1jkRE6GMyxW1/V2F34J2NsZ54z7eZiPjr4CEZGE2AbIxOcX20rBHvG7OYrhPpCwOYLMGMOf/aHl2MaVNiw9Re74b5HxHavS19US+FC0VSZeGRlBUazuwrvt0Ke5d9o5ljhiDEzq0OH14mex8yp91HEAuM3IPoY2lcRaSxdKw9ILhaCOpMkdW6xIGzHdLdZeBiQzunc+1MnTqdt2SNCdTvDOWl0lEwmm0oAIbP0LjotDQZAzZE6jr1S96YsbLgtAawIDAQAB</string>
+    <string name="RSA2_PRIVATE">MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCEHUKkTKfstblDabFB8EHAqFlTOr2D5OnIiYNrdFhRi7kbPLHK/TE076gSiaKjUnyJfjdXMx/JDOCcKek3AxtS8GgZLrwdPa1JAMG9MZsRSx925+V5u4xdpt7l/lK5F7zT7H1A6nCVZtbLIWf8FvBXWz35ZtO/0iK9s/pMn9A4Q6qr1Tcgd0/IPmmtm5ks4YMdbSULP6kZR9U2Rglmyb6QYooVx3bC8DS7zey93dTebMTll6UrV32Eo2waNtdgEH3ynEvKMgorticzmoDUXIGY3dvOWqnqU1eTF7TmYYye0y24cC32Wt9wKjRL/DTYr/dvhTVzfhvWOX/tkmTfob79AgMBAAECggEAd483WRLaQTivwVcsCB1Sk/SGafDVwz/tZgM0gJEYwCtvSDvkNmxuFJbyBlyyZ5VliNRFZs+oaz0RI6I2IQfZuXRA8NE/gkLnyBI8QmhbCgpvHh98p27X94TlYUSIPmNCCpORQqcnXb1kkw3XWea0eInlCwhIhua3c/AliyRxvggJBS9yy8B+8Kmv0wDQCHw/twFA7K9uLmmAS63dl3PxI1XksI4LZVEDwpRAIaW2PkU4AB4HjhY0H0CPiXWuXnv22094E3xkn86zBeHO2Y0SjHrZAp6//Rb72cjcvzbE2UxJzZtMN78CXBICsH8r7M3aHrOLX4eAe5FeHRnbzjcCQQKBgQDFQK2MWLbBe9moBnkK5tMoIjB/wc+Wl6Tb4Gl2uhV1rGuHvbFcvimOfqozxLt2hkFjrnP9Ap0HAwJQC7ixzzkgvNpKRaP/nxFZ4uS8O7MDzseJcAa3qlhlpcCFvI3nSRHhHuTAKynvZW0kfXmJCS2FwihB/aMareil1Ekinuwb8QKBgQCrdi1M0PL483pSwx2EtRA9pFKNM6Wtjj8CCDjlD1gWs+kX0giktOQZhJ992Q9XqI4/385PgSi1/nXX2EYYUoqjl3ZBk8xbNE/gxnqR66dEm6QqFyBBSseqrpce1HNt4LzNFfjvpbyqvf79uj3Hqg2Qxjj5Q/0qDgrtkn6VbvBPzQKBgANsENa7f0gyDt+kZRs0T/uFRFQjF6fkL58E8K93oQGuoRr0xov2XKA1QFyvkBUJVT8Werqr/e9uNO8QlP64uqP/wsXBGYxIxTNLBW7ilkN9peaTg/pRwUDaNFHdqJSXpvDB6XQQC6U0nEUizCX9e8WzTaF/dgHzfHLMEQzBtxTxAoGAQZz0ktu2zwulOLyPtDPxphUWvhAQi4zOkcGBvC4WAIISZdorEpRiYV1+BxOkKmBHJyxG7+e2I4bfo5yQnkgf46BXUZr0bcZj9tkdGG/8T2Xb+XtmDXZHWAp9q/+SuG5y8WxCGbrrqs8QIBpAAAMUM92W+dRJsekzx1vy8s5ESdUCgYArkXisdJoSbWhxgKrRyPUlfR2UnftNmD8u59oRAz6qXM6SZM2CnkeaAKPT0AvEe4NzbX8zkTiCWlwc/ihW3+FUQwuRbfv2MfQ8VNIWHZBsxO2sVD7Sedq+FeBlrfgdvVxB/0/hf5AeRSsmcmxFWmXUMcY5OBAO8kIaULkxFuzGQg==</string>
+    <string name="demo_info_text">Warning: \n\nFor demonstration purpose, the assembling and signing of the request parameters are done on the client side.\nHowever, in practice, both assembling and signing MUST BE carried out on the server side.</string>
+    <string name="pay_with_alipay">Pay with Alipay</string>
+    <string name="pay_with_alipay_hk">Pay with AlipayHK</string>
+    <string name="auth_with_alipay">Authenticate with Alipay</string>
+    <string name="web_to_native">Call Alipay from Web Content</string>
+    <string name="check_sdk_version">Alipay SDK Version</string>
+    <string name="pay_success">Payment success:</string>
+    <string name="auth_failed">Authentication failed:</string>
+    <string name="error_missing_appid_rsa_private">Error: Missing \"APPID\" or \"RSA_PRIVATE\" in PayDemoActivity.</string>
+    <string name="error_missing_hk_partner_seller_rsa_private">Error: Missing \"PARTNER\", \"SELLER\", or \"RSA_PRIVATE\\ in OrderUtils1_0_HK.</string>
+    <string name="pay_result">Payment result:</string>
+    <string name="error_auth_missing_partner_appid_rsa_private_target_id">Error: Missing \"PARTNER\", \"APP_ID\", \"RSA_PRIVATE\", or \"TARGET_ID\" in PayDemoActivity.</string>
+    <string name="confirm">Confirm</string>
+    <string name="pay_failed">Payment failed:</string>
+    <string name="auth_success">Authentication success:</string>
+    <string name="alipay_sdk_version_is">"Alipay SDK version: "</string>
+    <string name="error_missing_h5_pay_url">Missing URL to load. Please configure in PayDemoActivity.h5Pay()</string>
+    <string name="error">Error</string>
+    <string name="pay_cross_border">Cross-border Pay with Alipay</string>
+    <string name="error_missing_global_partner_seller_rsa_private" >Error: Missing \"PARTNER\", \"SELLER\", or \"RSA_PRIVATE\\ in OrderUtils1_0_Global.</string>
+    <string name="payment_inst_hk">Payer: HK</string>
+    <string name="payment_inst_cn">Payer: CN</string>
 </resources>

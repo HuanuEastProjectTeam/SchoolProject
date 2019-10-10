@@ -30,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.baidunavis.BaiduNaviParams;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -64,11 +65,13 @@ import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.navisdk.adapter.BNRoutePlanNode;
 import com.baidu.navisdk.adapter.BaiduNaviManagerFactory;
 import com.baidu.navisdk.adapter.IBNRoutePlanManager;
 import com.baidu.navisdk.adapter.IBNTTSManager;
 import com.baidu.navisdk.adapter.IBaiduNaviManager;
+import com.baidu.navisdk.adapter.impl.BaiduNaviManager;
 import com.example.andriodcar.MainActivity;
 import com.example.andriodcar.R;
 
@@ -106,6 +109,8 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     //地图导航
     private String authinfo,mSDCardPath,APP_FOLDER_NAME="Car导航";
     static final String ROUTE_PLAN_NODE = "routePlanNode";
+    private List<SuggestionResult.SuggestionInfo> Pt;
+    private ImageButton go;
     // 定位相关
     LocationClient mLocClient;
     public MyLocationListenner myListener = new MyLocationListenner();
@@ -136,6 +141,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private List<LatLng> pointMap;
     private List<OverlayOptions> overlayOptions,overlayOptionsText;
 
+
     //覆盖物事件
     private TextView textView_Name,textView_Num;
     private boolean textViewBiaoZhi=false;//消息框显示判断标志
@@ -154,7 +160,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         //获取地图控件引用
         mMapView = (MapView) findViewById(R.id.bmapView);
         mBaiduMap = mMapView.getMap();
-        mBaiduMap.setMyLocationEnabled(true);
 
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
@@ -180,13 +185,10 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         //调用创建覆盖物图标方法
         overlayMapADdd(longiLatiTude);//longiLatiTude为小区地图覆盖物对象的集合对象
 
-
-
-
         //覆盖物点击事件
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
+            public boolean onMarkerClick(final Marker marker) {
                 /**
                  * 点击了车库显示图标触发事件，然后显示该地区的车位使用情况
                  */
@@ -210,7 +212,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                                  * 出现导航，指引用户前往地点
                                  */
 
-
                             }
                         });
                     }
@@ -218,7 +219,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
 
               //  Toast.makeText(MapActivity.this, "点击了", Toast.LENGTH_LONG).show();
-
+                baiduNaviGo(marker);
                 return false;
             }
         });
@@ -321,6 +322,23 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     /**
+     * 覆盖物导航图标点击事件方法
+     */
+    private void baiduNaviGo(final Marker marker) {
+        go=findViewById(R.id.go);//覆盖物导航控件
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SuggestionResult.SuggestionInfo a=new SuggestionResult.SuggestionInfo();
+                a.setPt(marker.getPosition());
+                a.setKey(marker.getTitle());
+                baiduNavigation(a);//调用了初始化导航方法
+
+            }
+        });
+    }
+
+    /**
      * 驾车导航路线规划
      */
     private void routePlanCar(String stAddress, String enAddress) {
@@ -408,16 +426,19 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                     searchResult=suggestionResult.getAllSuggestions();//获取搜索结果集、
                     if(list.size()>0){
                         list.removeAll(list);//清除原本数据
+                        Pt.removeAll(Pt);
                     }
                     String address[]=new String[searchResult.size()];//创建搜索结果地址
                     String uid[]=new String[searchResult.size()];//创建搜索结果的指定uid
                     String key[]=new String[searchResult.size()];//常见搜索结果的key
                     String district[]=new String[searchResult.size()];//搜索结果的地区
                     String city[]=new String[searchResult.size()];//搜索结果的城市
+                   // Pt[]=new LatLng[searchResult.size()];//获取经纬度
                     for(int a=0;a<searchResult.size();a++){
                         Log.i("gg","结果："+searchResult.get(a));
                         //   Log.e("gg",searchResult.get(0)+"测试");
                         Log.e("gg","测试："+searchResult.get(a));
+                        Pt.add(searchResult.get(a));
                         address[a]=searchResult.get(a).getAddress();
                         uid[a]=searchResult.get(a).getUid();
                         key[a]=searchResult.get(a).getKey();
@@ -466,13 +487,13 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                      * 调用路线规划方法处理点击的事件，并且获取点击的搜索目的地,后续传入目的地参数
                      */
                  //   routePlanCar(myLocation.getAddrStr(),key1[i]);//起点未实现，暂不调用
-                    baiduNavigation();//调用百度导航引擎初始化方法
+                    baiduNavigation(Pt.get(i));//调用百度导航引擎初始化方法
 
                     layout.setVisibility(View.GONE);
                 }
             });
         }else{
-
+            Pt.removeAll(Pt);
             list.removeAll(list);
         }
 
@@ -481,21 +502,23 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     /**
      * 导航算路方法
      */
-    private void naviRoutePlan() {
+    private void naviRoutePlan(SuggestionResult.SuggestionInfo pt) {
         //创建起点和终点
+        CoordinateConverter converter=new CoordinateConverter();
+
         BNRoutePlanNode sNode=new BNRoutePlanNode.Builder()
-                .latitude(40.05087)
-                .longitude(116.30142)
-                .name("百度大厦")
-                .description("百度大厦")
-                .coordinateType(BNRoutePlanNode.CoordinateType.GCJ02)
+                .latitude(myLocation.getLatitude())
+                .longitude(myLocation.getLongitude())
+                .name(myLocation.getBuildingName())
+                .description(myLocation.getLocTypeDescription())
+                .coordinateType(BNRoutePlanNode.CoordinateType.BD09LL)
                 .build();
         BNRoutePlanNode eNode=new BNRoutePlanNode.Builder()
-                .latitude(39.90882)
-                .longitude(116.39750)
-                .name("北京天安门")
-                .description("北京天安门")
-                .coordinateType(BNRoutePlanNode.CoordinateType.GCJ02)
+                .latitude(pt.getPt().latitude)
+                .longitude(pt.getPt().longitude)
+                .name(pt.getKey())
+                .description(pt.getDistrict())
+                .coordinateType(BNRoutePlanNode.CoordinateType.BD09LL)
                 .build();
         List<BNRoutePlanNode>listBN=new ArrayList<>();
         listBN.add(sNode);
@@ -537,7 +560,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     /**
      * 百度导航实现方法
      */
-    private void baiduNavigation() {
+    SuggestionResult.SuggestionInfo latLng;
+    private void baiduNavigation(SuggestionResult.SuggestionInfo pt) {
+        latLng=pt;
         initDirs();//调用初始化sd卡处理方法
         BaiduNaviManagerFactory.getBaiduNaviManager().init(getApplicationContext(),mSDCardPath,APP_FOLDER_NAME, new IBaiduNaviManager.INaviInitListener() {
             @Override
@@ -560,6 +585,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 });
 
 
+
             }
 
             @Override
@@ -580,7 +606,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 Log.i("gg","百度导航引擎初始化成功");
                 //初始化tts
                 initTTs();
-                naviRoutePlan();//调用算路方法
+                naviRoutePlan(latLng);//调用算路方法
             }
 
             @Override
@@ -598,31 +624,38 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
      * 初始化语言合成方法
      */
     private void initTTs() {
-        BaiduNaviManagerFactory.getTTSManager().initTTS(getApplicationContext(),mSDCardPath,APP_FOLDER_NAME,"3Beb1bcX2PItsFUONe8AUy8xRxBzDLXU");
-        //注册同步内置tts状态回调
-        BaiduNaviManagerFactory.getTTSManager().setOnTTSStateChangedListener(new IBNTTSManager.IOnTTSPlayStateChangedListener() {
-            @Override
-            public void onPlayStart() {
-                Log.i("gg","ttsCallback.onPlanyStart");
-            }
+        // 使用内置TTS
+        BaiduNaviManagerFactory.getTTSManager().initTTS(getApplicationContext(),
+                getSdcardDir(), APP_FOLDER_NAME,"16427398");
 
-            @Override
-            public void onPlayEnd(String s) {
-                Log.i("gg","tts回调结束");
+        // 注册同步内置tts状态回调
+        BaiduNaviManagerFactory.getTTSManager().setOnTTSStateChangedListener(
+                new IBNTTSManager.IOnTTSPlayStateChangedListener() {
+                    @Override
+                    public void onPlayStart() {
+                        Log.e("BNSDKDemo", "ttsCallback.onPlayStart");
+                    }
 
-            }
+                    @Override
+                    public void onPlayEnd(String speechId) {
+                        Log.e("BNSDKDemo", "ttsCallback.onPlayEnd");
+                    }
 
-            @Override
-            public void onPlayError(int i, String s) {
-                Log.i("gg","tts回调出错");
-            }
-        });
-        //注册内置tts 异步状态消息
-        BaiduNaviManagerFactory.getTTSManager().setOnTTSStateChangedHandler(new Handler(Looper.getMainLooper()){
-            public void handleMessage(Message msg){
-                Log.i("gg","ttsHandler.msg.what="+msg.what);
-            }
-        });
+                    @Override
+                    public void onPlayError(int code, String message) {
+                        Log.e("BNSDKDemo", "ttsCallback.onPlayError");
+                    }
+                }
+        );
+        // 注册内置tts 异步状态消息
+        BaiduNaviManagerFactory.getTTSManager().setOnTTSStateChangedHandler(
+                new Handler(Looper.getMainLooper()) {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        Log.e("BNSDKDemo", "ttsHandler.msg.what=" + msg.what);
+                    }
+                }
+        );
     }
 
     /**
@@ -670,7 +703,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         overlayOptionsText=new ArrayList<OverlayOptions>();
         searchResult=new ArrayList<SuggestionResult.SuggestionInfo>();//搜索结果集合
         list=new ArrayList<String>();
+        Pt=new ArrayList<SuggestionResult.SuggestionInfo>();
     }
+
 
 
     /**
@@ -820,6 +855,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
         @Override
         public void onReceiveLocation(BDLocation location) {
+            myLocation=location;
             Log.i("gg",location.getAddrStr()+"getAddrStr"+location.getCity()+"getCity"+location.getBuildingName()+"getBuildingName"+location.getAddress().toString()+"getAddress");
             // map view 销毁后不在处理新接收的位置
             if (location == null || mMapView == null)

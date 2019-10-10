@@ -39,6 +39,15 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="jcZOMQ5RWVvUxQxqjNdn8L9p2AdFdrNv" />
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="jcZOMQ5RWVvUxQxqjNdn8L9p2AdFdrNv" />
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="jcZOMQ5RWVvUxQxqjNdn8L9p2AdFdrNv" />
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="jcZOMQ5RWVvUxQxqjNdn8L9p2AdFdrNv" />
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

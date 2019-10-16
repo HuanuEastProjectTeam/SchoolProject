@@ -25,13 +25,13 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_message);
         layout1=findViewById(R.id.touxiang);
-        layout2=findViewById(R.id.yonghu);
+        //layout2=findViewById(R.id.yonghu);        //YQ:10.16:去掉了用户名一行，只要用头像边上那个应该就可以了
         layout3=findViewById(R.id.renzheng);
         layout4=findViewById(R.id.sec);
         layout5=findViewById(R.id.number);
         layout6=findViewById(R.id.address);
         bu1=(Button)findViewById(R.id.fanhui);
-        textView=findViewById(R.id.yonghumin);
+        textView=findViewById(R.id.touxiang_text);      //YQ:10.16:定位由原来用户名一行改为定位到头像边上的用户名
         layout1.setOnClickListener(this);
         layout2.setOnClickListener(this);
         layout3.setOnClickListener(this);
@@ -63,7 +63,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
             }
             //点击了用户名
-            case R.id.yonghu:{
+            case R.id.touxiang_text:{           //YQ:10.16:更改为头像边上的用户名
                 dianji=true;
                 Intent intent1=new Intent(MessageActivity.this,YonghumingActivity.class);
                 startActivity(intent1);

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".LogInActivity">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -14,7 +14,7 @@
         android:background="@color/colorPrimary"
         >
         <Button
-            android:id="@+id/register_fanhui"
+            android:id="@+id/Login_fanhui"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="&lt;  返回"
@@ -23,7 +23,7 @@
             android:layout_centerVertical="true"
             />
         <TextView
-            android:id="@+id/register_xinxi"
+            android:id="@+id/Login_xinxi"
             android:layout_height="50dp"
             android:layout_width="fill_parent"
             android:text=""
@@ -42,7 +42,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="注册"
+            android:text="登录"
             android:textSize="40dp"
             android:textColor="@color/heise"/>
 
@@ -53,13 +53,13 @@
             android:layout_marginTop="30dp">
 
             <TextView
-                android:id="@+id/register_name_tag"
+                android:id="@+id/Login_name_tag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="用户名"
                 android:textSize="25dp"/>
             <EditText
-                android:id="@+id/register_name"
+                android:id="@+id/Login_name"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginTop="5dp"
@@ -74,13 +74,13 @@
             android:layout_marginTop="30dp">
 
             <TextView
-                android:id="@+id/register_password_tag"
+                android:id="@+id/Login_password_tag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="密码"
                 android:textSize="25dp"/>
             <EditText
-                android:id="@+id/register_password"
+                android:id="@+id/Login_password"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginTop="5dp"
@@ -88,50 +88,57 @@
                 />
 
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="30dp">
-
-            <TextView
-                android:id="@+id/register_passwordConfirm_tag"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="重复密码"
-                android:textSize="25dp"/>
-            <EditText
-                android:id="@+id/register_passwordConfirm"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="5dp"
-                android:hint="请再输入一遍密码"
-                />
-
-        </LinearLayout>
     </LinearLayout>
 
     <Button
-        android:id="@+id/register_ConfirmButton"
+        android:id="@+id/Login_ConfirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="40dp"
-        android:text="注册"
+        android:text="登录"
         android:textSize="40dp"
         android:textColor="#FFFFFF"
         android:background="#66ccff"/>
 
     <Button
-        android:id="@+id/register_ExitButton"
+        android:id="@+id/Login_ExitButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="10dp"
-        android:text="取消注册"
+        android:text="取消登录"
         android:textSize="40dp"
         android:textColor="#FFFFFF"
         android:background="#dc143c"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/Login_ForgetPasswordButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@android:color/transparent"
+            android:text="忘记密码？"
+            android:textSize="15dp"
+            android:textColor="#66ccff"/>
+
+        <Button
+            android:id="@+id/Login_RegisterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            android:text="用户注册"
+            android:textSize="15dp"
+            android:textColor="#66ccff"/>
+
+    </RelativeLayout>
+
 </LinearLayout>

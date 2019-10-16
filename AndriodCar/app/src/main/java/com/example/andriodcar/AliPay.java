@@ -87,7 +87,7 @@ public class AliPay {
         }
     };
 
-    public void payV2(String Price) {
+    public void payV2(String Price) {               //输入一个字符形式的价格就可以直接付款
         if (TextUtils.isEmpty(APPID) || (TextUtils.isEmpty(RSA2_PRIVATE) && TextUtils.isEmpty(RSA_PRIVATE))) {
             showAlert(context, context.getString(R.string.error_missing_appid_rsa_private));
             return;

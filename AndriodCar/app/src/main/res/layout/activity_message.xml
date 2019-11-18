@@ -38,70 +38,43 @@
     android:id="@+id/touxiang"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-
     >
-    <TextView
-        android:id="@+id/touxiang1"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="30dp"
-        android:text="头像"
-        android:textColor="@color/heise"
-        android:textSize="18sp" />
-
     <ImageButton
-        android:id="@+id/touxiang2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/touxiang_image"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/touxiang1"
         android:background="@null"
-        android:src="@mipmap/wode_touxiang" />
-
-</RelativeLayout>
-<RelativeLayout
-        android:id="@+id/yonghu"
+        android:src="@mipmap/wode_touxiang" />\
+    <TextView
+        android:id="@+id/touxiang_text"
+        android:layout_toRightOf="@id/touxiang_image"
+        android:gravity="center"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-
-        >
-    <TextView
-        android:id="@+id/textView2"
+        android:layout_marginTop="30dp"
+        android:text="用户名"
+        android:textSize="25dp"
+        android:textColor="@color/heise"/>
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#ece8e8"
-        />
-    <TextView
-        android:id="@+id/yonghuming1"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="1dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="30dp"
-        android:text="用户名："
-        android:textColor="@color/heise"
-        android:textSize="18sp" />
-    <TextView
-        android:id="@+id/yonghumin"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="测试"
-        android:textSize="18sp"
-        android:textColor="@color/heise"
-        android:layout_toRightOf="@id/yonghuming1"
-        android:layout_centerVertical="true"
-        />
+        android:layout_toRightOf="@id/touxiang_image"
+        android:layout_below="@id/touxiang_text"
+        android:gravity="center">
+        <TextView
+            android:text="用户id："
+            android:textSize="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:id="@+id/touxiang_id"
+            android:text="12345678"
+            android:textSize="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="11dp"
-        android:layout_marginRight="11dp"
-        android:text="&lt;" />
 </RelativeLayout>
 
     <RelativeLayout
@@ -135,11 +108,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/shiming1"
+            android:layout_toLeftOf="@id/renzheng_tag"
             android:text="否"
             android:textColor="@color/heise"
             android:textSize="18sp" />
         <TextView
+            android:id="@+id/renzheng_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -178,10 +152,11 @@
             android:text="女"
             android:textSize="18sp"
             android:textColor="@color/heise"
-            android:layout_toRightOf="@id/xingbie1"
+            android:layout_toLeftOf="@id/sec_tag"
             android:layout_centerVertical="true"
             />
         <TextView
+            android:id="@+id/sec_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -220,10 +195,11 @@
             android:text="123456789"
             android:textSize="18sp"
             android:textColor="@color/heise"
-            android:layout_toRightOf="@id/phonenumber1"
+            android:layout_toLeftOf="@id/phonenumber_tag"
             android:layout_centerVertical="true"
             />
         <TextView
+            android:id="@+id/phonenumber_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -262,10 +238,11 @@
             android:text="湖南长沙"
             android:textSize="18sp"
             android:textColor="@color/heise"
-            android:layout_toRightOf="@id/suozaidi1"
+            android:layout_toLeftOf="@id/address_tag"
             android:layout_centerVertical="true"
             />
         <TextView
+            android:id="@+id/address_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -276,6 +253,17 @@
             android:text="&lt;" />
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/QuitLogin_Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="#dc143c"
+        android:text="退出登录"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"/>
 
 
 

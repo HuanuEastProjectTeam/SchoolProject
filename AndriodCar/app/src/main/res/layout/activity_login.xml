@@ -61,7 +61,7 @@
             <EditText
                 android:id="@+id/Login_name"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="5dp"
                 android:hint="请输入用户名"
                 />
@@ -82,9 +82,9 @@
             <EditText
                 android:id="@+id/Login_password"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="5dp"
-                android:hint="请输入密码"
+                android:hint="请输入8~16位的密码"
                 />
 
         </LinearLayout>
@@ -94,25 +94,25 @@
         android:id="@+id/Login_ConfirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginTop="20dp"
         android:text="登录"
-        android:textSize="40dp"
+        android:textSize="30dp"
         android:textColor="#FFFFFF"
-        android:background="#66ccff"/>
+        android:background="@drawable/btn_bg_blue"/>
 
     <Button
         android:id="@+id/Login_ExitButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="30dp"
-        android:layout_marginLeft="30dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginLeft="70dp"
         android:layout_marginTop="10dp"
         android:text="取消登录"
-        android:textSize="40dp"
+        android:textSize="30dp"
         android:textColor="#FFFFFF"
-        android:background="#dc143c"/>
+        android:background="@drawable/btn_bg_red"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -13,7 +13,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/colorPrimary"
+        android:background="@color/white"
         >
         <Button
             android:id="@+id/fanhui"
@@ -98,7 +98,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="1dp"
             android:gravity="center_vertical"
-            android:paddingLeft="30dp"
+            android:paddingLeft="10dp"
             android:text="实名认证："
             android:textColor="@color/heise"
             android:textSize="18sp" />
@@ -141,7 +141,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="1dp"
             android:gravity="center_vertical"
-            android:paddingLeft="30dp"
+            android:paddingLeft="10dp"
             android:text="性别："
             android:textColor="@color/heise"
             android:textSize="18sp" />
@@ -184,7 +184,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="1dp"
             android:gravity="center_vertical"
-            android:paddingLeft="30dp"
+            android:paddingLeft="10dp"
             android:text="手机号码："
             android:textColor="@color/heise"
             android:textSize="18sp" />
@@ -227,7 +227,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="1dp"
             android:gravity="center_vertical"
-            android:paddingLeft="30dp"
+            android:paddingLeft="10dp"
             android:text="所在地："
             android:textColor="@color/heise"
             android:textSize="18sp" />
@@ -260,7 +260,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
-        android:background="#dc143c"
+        android:background="@drawable/btn_gb_red"
         android:text="退出登录"
         android:textColor="#FFFFFF"
         android:textSize="25dp"/>

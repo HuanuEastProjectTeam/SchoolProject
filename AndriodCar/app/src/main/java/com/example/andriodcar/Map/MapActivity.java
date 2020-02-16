@@ -843,7 +843,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mMapView = null;
         myOrientationListener.stop();//关闭传感器
         mSuggestionSearch.destroy();
-        routePlanSearch.destroy();//释放检索实例
+        if(routePlanSearch != null){
+            routePlanSearch.destroy();//释放检索实例
+        }
         super.onDestroy();
     }
 

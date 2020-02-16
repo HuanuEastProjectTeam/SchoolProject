@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">EparkCar</string>
+    <string name="title">EparkCar</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">个人中心</string>
@@ -9,7 +10,11 @@
     <string name="qianbao_zichan">Epark钱包</string>
     <string name="fanhui">返回</string>
     <string name="tijiao">提交</string>
-
+    <string name="gonglue">最新攻略</string>
+    <string name="index">首页</string>
+    <string name="my">消息</string>
+    <string name="message">信息资讯</string>
+    <string name="particularMessage">德勤发布一份最新报告《停车场的未来》(The future of parking)。报告显示，停车可能是下一个被新技术和商业模式所颠覆。报告显示，美国人平均每年花17个小时寻找停车位，导致每个司机浪费时间，燃料和排放成本为345美元。大都市地区的成本上涨，纽约的司机每年花费107小时和2,243美元。对于本地企业，定价政策和费率可能会对客户流量产生负面影响。</string>
 
     <!--支付宝支付所需的String常量-->
     <string name="APPID">2016101300678068</string>

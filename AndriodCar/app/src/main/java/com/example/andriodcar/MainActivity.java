@@ -15,7 +15,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.text.Layout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +69,9 @@ import utils.javautils;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener , View.OnClickListener{
 
+    //日志提示信息
+    private final static String log = "我是日志信息：";
+
     //登录标记
     public static boolean logflag=false;
 
@@ -77,7 +83,7 @@ public class MainActivity extends AppCompatActivity
      */
     public static final int REQUEST_CODE = 111;
 
-//动态申请权限
+    //动态申请权限
     private static final int BAIDU_READ_PHONE_STATE = 100;
 
     // 图片轮播控件
@@ -98,6 +104,13 @@ public class MainActivity extends AppCompatActivity
     private Button btn_money;
     //地图
     private  Button btn_carmap;
+    //帮助
+    private Button  btn_help;
+
+    //显示信息
+    private RelativeLayout relativeLayoutOne;
+    private RelativeLayout relativeLayoutTwo;
+    private RelativeLayout relativeLayoutThree;
 
 
     @Override
@@ -105,13 +118,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //标题为空
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
-
-
-
         //初始化权限
-
         judgePermission();
+      /*
+      首页信封图标点击事件
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -126,6 +139,7 @@ public class MainActivity extends AppCompatActivity
                         }).show();
             }
         });
+        */
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -135,6 +149,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setItemIconTintList(null);//显示菜单图标
+        navigationView.setItemTextColor(null);
         navigationView.setNavigationItemSelectedListener(this);
 
         /*图片方法初始化*/
@@ -162,13 +177,16 @@ public class MainActivity extends AppCompatActivity
         });
 
 
-        //缴费
+        //空闲车位的发布
         btn_money=findViewById(R.id.money);
         btn_money.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //跳转到发布停车位
-                Toast.makeText(MainActivity.this,"功能还在开发中····",Toast.LENGTH_SHORT).show();
+            //    Toast.makeText(MainActivity.this,"功能还在开发中····",Toast.LENGTH_SHORT).show();
+                Log.i(log,"进入空闲车位表单页面");
+                Intent intent = new Intent(MainActivity.this,FromCar.class);
+                startActivity(intent);
             }
         });
 
@@ -184,6 +202,132 @@ public class MainActivity extends AppCompatActivity
         });
 
 
+        //帮助实现
+        btn_help = findViewById(R.id.help);
+        btn_help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,HelpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+    }
+    /**
+     * 首页和我的点击方法
+     * 点击后分别显示首页界面和我的信息界面
+     * 同时更换按钮活动图标
+     *
+     */
+    public void indexAndmyMessage(View view){
+        //获得首页布局id
+        LinearLayout linearLayout = findViewById(R.id.indexLayout);
+        //获取信息页面布局id
+        LinearLayout linearLayout1 = findViewById(R.id.myMessageLayout);
+        //导航栏的文字控件
+        TextView textView =findViewById(R.id.toolbar_title);
+        switch (view.getId()){
+            case R.id.index_1 : {
+                //默认进入软件首先展示首页
+                Log.i(log,"点击了首页");
+                //设置图标,把首页设置为活跃状态
+                drawIndexAndMyMessageIcon(view.getId(),R.drawable.index_activity);
+                //把我的设置为停止状态，更改图标
+                drawIndexAndMyMessageIcon(R.id.my,R.drawable.mymessage);
+                //设置首页信息可见，占据空间
+                linearLayout.setVisibility(View.VISIBLE);
+                //隐藏我的信息页面
+                linearLayout1.setVisibility(View.GONE);
+                textView.setText("首页");
+                break;
+            }
+            case R.id.my :{
+                //点击了我的
+                Log.i(log,"点击了我的");
+                //设置图标,把首页设置为停止状态
+                drawIndexAndMyMessageIcon(R.id.index_1,R.drawable.index);
+                //把我的设置为活跃状态，更改图标
+                drawIndexAndMyMessageIcon(view.getId(),R.drawable.mymessage_activity);
+                //设置首页不显示,留出空间
+                linearLayout.setVisibility(View.GONE);
+                //显示我的信息页面
+                linearLayout1.setVisibility(View.VISIBLE);
+                textView.setText("我的");
+                break;
+            }
+        }
+
+    }
+
+    /**
+     * 改变按钮图标
+     * @param age1 按钮对象对应的int值
+     * @param age 图标对应的int值
+     */
+    public void drawIndexAndMyMessageIcon(int age1,int age){
+        Button buttonIndexMy = findViewById(age1);
+        Drawable drawable = getResources().getDrawable(age);
+        drawable.setBounds(0,0,100,100);
+        buttonIndexMy.setCompoundDrawables(null,drawable,null,null);
+    }
+
+    /**
+     * 首页信息展示卡片的点击事件
+     * 点击后显示详细信息
+     * @param view 点击的view
+     */
+    public void ShowMessage(View view){
+        //获取到三个信息卡片的id
+        relativeLayoutOne = findViewById(R.id.one);
+        relativeLayoutTwo = findViewById(R.id.two);
+        relativeLayoutThree = findViewById(R.id.three);
+        switch(view.getId()){
+            case R.id.one:{
+                //点击了第一个卡片信息
+                Log.i(log,"点击了第一个卡片信息");
+                /**
+                 * 点击信息卡片之后，跳转到详情页面
+                 * 再详情页面重新加载
+                 * 传递当前点击信息卡片展示的信息id
+                 * 在详情信息页面进行重新查询展示
+                 * 在bean中获取新闻信息id,
+                 * 此处需要一个新闻信息bean
+                 *
+                 */
+                //数据携带对象
+                Bundle bundle = new Bundle();
+                //假定第一个信息卡片显示的信息的id为1
+                bundle.putInt("messageId",1);
+                Intent intent =  new Intent(MainActivity.this,ParticularActivity.class);
+                //放入跳转对象
+                intent.putExtras(bundle);
+                startActivity(intent);
+                break;
+            }
+            case R.id.two:{
+                //点击了第二个卡片信息
+                Bundle bundle = new Bundle();
+                //假定第一个信息卡片显示的信息的id为2
+                bundle.putInt("messageId",2);
+                Intent intent =  new Intent(MainActivity.this,ParticularActivity.class);
+                //放入跳转对象
+                intent.putExtras(bundle);
+                startActivity(intent);
+                break;
+            }
+            case R.id.three:{
+                //点击了第三个卡片信息
+                Bundle bundle = new Bundle();
+                //假定第一个信息卡片显示的信息的id为3
+                bundle.putInt("messageId",3);
+                Intent intent =  new Intent(MainActivity.this,ParticularActivity.class);
+                //放入跳转对象
+                intent.putExtras(bundle);
+                startActivity(intent);
+                break;
+            }
+        }
     }
 
 
@@ -304,7 +448,7 @@ public class MainActivity extends AppCompatActivity
 
                     //与Tomcat服务器进行连接，传输账号信息-----------------------------------------------------------------------------------------------
 
-                                    String path="http://192.168.43.131:8080/TomcatTest/HelloServlet?loginname="+uid+"&password="+upwd;
+                                    String path="http://120.79.87.21/TomcatTest/HelloServlet?loginname="+uid+"&password="+upwd;
                                     try {
                                         try{
                                             URL url = new URL(path); //新建url并实例化

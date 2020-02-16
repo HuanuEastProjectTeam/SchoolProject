@@ -1,5 +1,6 @@
 package com.example.andriodcar;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +10,7 @@ import android.widget.EditText;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private Button btn_ConfirmButton,btn_ExitButton,btn_fanhui;
+    private Button btn_ConfirmButton,btn_fanhui,btn_ToRegister;
     private EditText et_name,et_password,et_passwordConfirm;
 
     @Override
@@ -18,8 +19,8 @@ public class RegisterActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);//取消标题栏
         setContentView(R.layout.activity_register);
         btn_ConfirmButton = findViewById(R.id.register_ConfirmButton);
-        btn_ExitButton = findViewById(R.id.register_ExitButton);
         btn_fanhui = findViewById(R.id.register_fanhui);
+        btn_ToRegister = findViewById(R.id.register_ToRegister);
         et_name = findViewById(R.id.register_name);
         et_password = findViewById(R.id.register_password);
         et_passwordConfirm = findViewById(R.id.register_passwordConfirm);
@@ -30,12 +31,13 @@ public class RegisterActivity extends AppCompatActivity {
             case R.id.register_ConfirmButton:{
                 break;
             }
-            case R.id.register_ExitButton:{
+            case R.id.register_fanhui:{
                 finish();
                 break;
             }
-            case R.id.register_fanhui:{
-                finish();
+            case R.id.register_ToRegister:{
+                Intent intent = new Intent(this,RegisterActivity.class);
+                startActivity(intent);
                 break;
             }
             default:

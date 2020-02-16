@@ -30,7 +30,7 @@
             android:layout_weight="20"
             android:text="注册"
             android:gravity="center"
-            android:textColor="@color/heise"
+            android:textColor="@color/text_black"
             android:textSize="19sp" />
         <Button
             android:id="@+id/register_ToRegister"
@@ -137,15 +137,15 @@
         android:textColor="#FFFFFF"
         android:background="@drawable/btn_bg_bule"/>
 
-    <Button
-        android:id="@+id/Login_ExitButton"
+    <TextView
+        android:id="@+id/Login_AgreeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:gravity="center"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="10dp"
-        android:text="点击注册即表示您同意我们的<EParkCar用户注册协议>"
+        android:text="点击注册即表示您同意我们的&lt;EParkCar用户注册协议&gt;"
         android:textSize="20dp"
         android:textColor="@color/text_black"
         android:background="@color/transparent"

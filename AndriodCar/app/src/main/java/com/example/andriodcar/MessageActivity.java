@@ -33,7 +33,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         bu1=(Button)findViewById(R.id.fanhui);
         textView=findViewById(R.id.touxiang_text);      //YQ:10.16:定位由原来用户名一行改为定位到头像边上的用户名
         layout1.setOnClickListener(this);
-        layout2.setOnClickListener(this);
+      //  layout2.setOnClickListener(this);
         layout3.setOnClickListener(this);
         layout4.setOnClickListener(this);
         layout5.setOnClickListener(this);

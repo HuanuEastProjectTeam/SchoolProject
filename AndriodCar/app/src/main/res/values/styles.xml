@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/transparent</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionOverflowButtonStyle">@style/AppTheme.AppBarOverlay</item>
@@ -15,12 +15,12 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:src">@drawable/qianbao</item><!--设置三点的图标-->
-
+        <item name="android:src">@drawable/headlean</item><!--设置三点的图标-->
+        <item name="colorControlNormal">@color/heise</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    <style name="notitle">
+    <style name="notitble">
 
         <item name="android:windowNoTitle">true</item>
 

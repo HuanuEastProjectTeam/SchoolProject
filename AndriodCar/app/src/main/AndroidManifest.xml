@@ -11,11 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+<<<<<<< HEAD
         <activity android:name=".Map.SuggesitionSearchResultActivity"></activity>
-
+=======
         <activity android:name=".LogInActivity"></activity>
-
+>>>>>>> 3f87cff4c9e53fdea21efcd726d2e4ae560a8be9
 
         <activity
             android:name=".MainActivity"
@@ -38,7 +38,7 @@
         <activity android:name=".YonghumingActivity" />
         <activity android:name=".OpenLack" />
         <activity android:name=".StartTimeActivity" />
-
+<<<<<<< HEAD
         <activity android:name=".Map.GuideActivity"/>
         <activity android:name=".Map.DemoGuideActivity"/>
         <meta-data
@@ -53,11 +53,11 @@
         <meta-data
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="jcZOMQ5RWVvUxQxqjNdn8L9p2AdFdrNv" />
-
+=======
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="jcZOMQ5RWVvUxQxqjNdn8L9p2AdFdrNv" />
-
+>>>>>>> 3f87cff4c9e53fdea21efcd726d2e4ae560a8be9
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
@@ -72,9 +72,10 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- 读取设备硬件信息，统计数据 -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- 读取系统信息，包含系统版本等信息，用作统计 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 获取设备的网络状态，鉴权所需网络代理 -->
-
+<<<<<<< HEAD
+=======
     <uses-permission android:name="android.permission.INTERNET" /> <!-- 允许sd卡写权限，需写入地图数据，禁用后无法显示地图 -->
-
+>>>>>>> 3f87cff4c9e53fdea21efcd726d2e4ae560a8be9
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" /> <!-- 这个权限用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 获取统计数据 -->
@@ -85,8 +86,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 关于定位权限 -->
     <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 这个权限用于访问GPS定位 -->
-
-
+<<<<<<< HEAD
+=======
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -94,12 +95,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-
+>>>>>>> 3f87cff4c9e53fdea21efcd726d2e4ae560a8be9
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- 下两个获取蓝牙权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
+<<<<<<< HEAD
     <!-- 百度地图导航所需权限 start -->
     <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
     <uses-permission android:name="android.permission.ACCES_MOCK_LOCATION" />
@@ -112,10 +113,10 @@
     <!-- 摄影机 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- 百度地图导航所需权限 end -->
-
+=======
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
+>>>>>>> 3f87cff4c9e53fdea21efcd726d2e4ae560a8be9
 
 </manifest>

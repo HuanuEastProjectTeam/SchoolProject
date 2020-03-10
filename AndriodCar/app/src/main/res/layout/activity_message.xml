@@ -260,7 +260,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
-        android:background="@drawable/btn_bg_red"
+        android:background="#dc143c"
         android:text="退出登录"
         android:textColor="#FFFFFF"
         android:textSize="25dp"/>

@@ -66,8 +66,8 @@
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/user"
                 />
             <EditText
@@ -89,8 +89,8 @@
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/protectedaccount"
                 />
             <EditText
@@ -109,8 +109,8 @@
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/protectedaccount"
                 />
             <EditText
@@ -138,7 +138,7 @@
         android:background="@drawable/btn_bg_bule"/>
 
     <Button
-        android:id="@+id/Login_ExitButton"
+        android:id="@+id/Login_AgreeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -8,7 +8,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btn_ConfirmButton,btn_fanhui,btn_ToRegister;
     private EditText et_name,et_password,et_passwordConfirm;
@@ -24,6 +24,9 @@ public class RegisterActivity extends AppCompatActivity {
         et_name = findViewById(R.id.register_name);
         et_password = findViewById(R.id.register_password);
         et_passwordConfirm = findViewById(R.id.register_passwordConfirm);
+        btn_ConfirmButton.setOnClickListener(this);
+        btn_fanhui.setOnClickListener(this);
+        btn_ToRegister.setOnClickListener(this);
     }
 
     public void onClick(View view){

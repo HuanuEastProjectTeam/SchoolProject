@@ -48,7 +48,7 @@
             android:gravity="center"
             android:text="EParkCar"
             android:textColor="@color/text_black"
-            android:textSize="50dp"
+            android:textSize="40dp"
             android:theme="@android:style/Theme.Translucent" />
     </LinearLayout>
     <LinearLayout
@@ -62,12 +62,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal"
             android:layout_marginTop="30dp">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:src="@drawable/user"
                     />
                 <EditText
@@ -75,6 +78,7 @@
                     style="@style/Widget.AppCompat.EditText"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
+                    android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:hint="请输入账户名或电话号码" />
 
@@ -82,18 +86,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal"
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/protectedaccount" />
 
             <EditText
                 android:id="@+id/Login_password"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
                 android:hint="请输入密码"
                 />
@@ -109,7 +117,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="40dp"
         android:text="登录"
-        android:textSize="20dp"
+        android:textSize="30dp"
         android:textColor="#FFFFFF"
         android:background="@drawable/btn_bg_bule"/>
 

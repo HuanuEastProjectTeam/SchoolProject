@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="登陆"
+            android:text="登陆  &gt;"
             android:textSize="18sp"
             android:background="@null"/>
     </LinearLayout>
@@ -56,18 +56,21 @@
             android:gravity="center"
             android:text="EParkCar"
             android:textColor="@color/text_black"
-            android:textSize="50dp"
+            android:textSize="40dp"
             android:theme="@android:style/Theme.Translucent" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal"
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/user"
                 />
             <EditText
@@ -75,6 +78,7 @@
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
                 android:hint="请输入注册用电话号码" />
 
@@ -85,12 +89,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal"
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/protectedaccount"
                 />
             <EditText
@@ -98,6 +105,7 @@
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
                 android:hint="请输入密码" />
 
@@ -105,12 +113,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal"
             android:layout_marginTop="30dp">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/protectedaccount"
                 />
             <EditText
@@ -118,6 +129,7 @@
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
                 android:hint="请重复输入密码" />
 
@@ -133,7 +145,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="40dp"
         android:text="注册"
-        android:textSize="40dp"
+        android:textSize="30dp"
         android:textColor="#FFFFFF"
         android:background="@drawable/btn_bg_bule"/>
 
@@ -149,7 +161,7 @@
         android:background="@color/transparent"
         android:theme="@android:style/Theme.Translucent"
         android:stateListAnimator="@null"
-        android:text="点击注册即表示您同意我们&lt;EParkCar用户注册协议&gt;"
-        android:textSize="20dp"
+        android:text="点击注册即表示您同意我们的\n&lt;EParkCar用户注册协议&gt;"
+        android:textSize="15dp"
         />
 </LinearLayout>

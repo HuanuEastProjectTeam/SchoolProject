@@ -54,4 +54,5 @@ dependencies {
     implementation files('src\\main\\java\\com\\navittssandondk\\NaviTts.aar')
     implementation files('src\\main\\java\\com\\navittssandondk\\onsdk_all.aar')
     implementation(name: 'alipaySdk-15.6.5-20190718211148', ext: 'aar')
+    implementation files('libs/fastjson-1.1.33.jar')
 }

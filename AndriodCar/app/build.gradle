@@ -14,7 +14,7 @@ android {
         // 导航SDK内部使用了annotationProcessor，需要添加下面代码，防止编译异常
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
         applicationId "com.example.andriodcar"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"

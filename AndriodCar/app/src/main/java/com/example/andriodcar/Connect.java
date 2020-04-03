@@ -15,7 +15,11 @@ import java.io.IOException;
 import java.net.Socket;
 
 
-public class Contact {
+public class Connect {
+
+    /**
+     * 2020-4-3 袁铨：所有方法都需要重写
+     */
 
     private Socket socket;
     private DataInputStream instr;

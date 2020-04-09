@@ -60,6 +60,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import image.ImageCarousel;
 import image.ImageInfo;
@@ -112,6 +114,11 @@ public class MainActivity extends AppCompatActivity
     private RelativeLayout relativeLayoutTwo;
     private RelativeLayout relativeLayoutThree;
 
+    //线程池
+    public final static ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3 + 2);
+
+    //网络连接操作对象
+    static Connect ct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,6 +219,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                ct = new Connect();
+            }
+        });
 
     }
     /**
@@ -419,7 +432,6 @@ public class MainActivity extends AppCompatActivity
             if(!logflag){
                 Intent intent=new Intent(MainActivity.this,LogInActivity.class);
                 startActivity(intent);
-
             }else{
                 Toast.makeText(this,"账户已登录",Toast.LENGTH_SHORT).show();
             }
@@ -594,7 +606,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void showToast(CharSequence msg) {
+    public static void showToast(CharSequence msg) {
         DialogUIUtils.showToastLong(msg.toString());
     }
 
@@ -664,7 +676,6 @@ public class MainActivity extends AppCompatActivity
         }
         //LocationClient.reStart();
     }
-
 
 
 

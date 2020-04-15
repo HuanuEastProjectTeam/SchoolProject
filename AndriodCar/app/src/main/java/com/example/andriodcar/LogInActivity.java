@@ -13,6 +13,8 @@ import static com.example.andriodcar.MainActivity.threadPoolExecutor;
 
 public class LogInActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+
     Button btn_Confirm,btn_Forget,btn_fanhui,btn_ToRegister;
 
     EditText et_name,et_password;
@@ -31,7 +33,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         btn_ToRegister = findViewById(R.id.Login_ToRegister);
         et_name = findViewById(R.id.Login_name);
         et_password = findViewById(R.id.Login_password);
-        btn_Confirm.setOnClickListener(ComfirmButtonListener);
+        btn_Confirm.setOnClickListener(this);
         btn_fanhui.setOnClickListener(this);
         btn_ToRegister.setOnClickListener(this);
         btn_Forget.setOnClickListener(this);
@@ -54,22 +56,20 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(intent);
                 break;
             }
+            case R.id.confirm_btn:{
+                threadPoolExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        ct.login(et_name.getText().toString(),et_password.getText().toString());
+                    }
+                });
+            }
             default:
                 break;
         }
     }
 
-    View.OnClickListener ComfirmButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            threadPoolExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    ct.login(et_name.getText().toString(),et_password.getText().toString());
-                }
-            });
-        }
-    };
+
 
     }
 

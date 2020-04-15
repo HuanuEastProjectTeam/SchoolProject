@@ -1,5 +1,9 @@
 package com.example.andriodcar;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -28,6 +32,10 @@ public class Connect  {
 
     private JSONObject jsonData = null;
 
+    //数据持久化操作
+    private SharedPreferences sp_user;
+    private SharedPreferences.Editor editor_user;
+
 
     /**
      * 构造函数
@@ -42,6 +50,18 @@ public class Connect  {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 传入sharedpreference对象，用于保存用户数据
+     */
+    public void SetUserSharePreference(SharedPreferences sharedPreferences){
+        if(sharedPreferences != null){
+            sp_user = sharedPreferences;
+            editor_user = sp_user.edit();
+        }else{
+            Log.i(TAG,"传入的sharedPreferences为空");
         }
     }
 
@@ -169,10 +189,19 @@ public class Connect  {
         String Msend = search("login",job); //用本类的search方法将json对象转换为json字符串
         sendMessage(Msend);
         String reply = receiveMessage();    //获取服务器返回信息
-        Log.i("Connect","message received"+reply);
+        Log.i("Connect","login successful");
+        Log.i(TAG,"reply:"+reply);
         UserOrdinary uo = JSON.parseObject(reply,UserOrdinary.class);    //将服务器返回的消息解码为user类
         Log.i(TAG,"user phone number:"+uo.getPhoneNum());
         Log.i(TAG,"user password:"+uo.getPassword());
+
+        MainActivity.logflag = true;        //设置当前登录状态
+        MainActivity.userOrdinary = uo;
+        editor_user.putBoolean("logflag",true);
+        editor_user.putInt("PhoneNum",uo.getPhoneNum());     //保存登录信息，只保存登陆名和密码，下次开启app重新登陆
+        editor_user.putString("Password",uo.getPassword());
+        editor_user.apply();
+
     }
 
     public void Register(String phoneNum,String password){
@@ -184,6 +213,7 @@ public class Connect  {
         sendMessage(Msend);
         String reply = receiveMessage();    //获取服务器返回信息
         Log.i("Connect","message received"+reply);
+        login(phoneNum,password);
     }
 
     /**

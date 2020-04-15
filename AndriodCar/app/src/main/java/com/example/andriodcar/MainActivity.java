@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
+import com.example.andriodcar.Bean.UserOrdinary;
 import com.example.andriodcar.Map.MapActivity;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
@@ -119,6 +121,12 @@ public class MainActivity extends AppCompatActivity
 
     //网络连接操作对象
     static Connect ct;
+
+    //数据持久化操作对象
+    public SharedPreferences sp_user = getSharedPreferences("user", Context.MODE_PRIVATE);
+
+    //临时储存登录后用户信息
+    public static UserOrdinary userOrdinary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +231,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 ct = new Connect();
+                ct.SetUserSharePreference(sp_user);
+                if(sp_user.getBoolean("logflag",false)){
+                    ct.login(String.valueOf(sp_user.getInt("PhoneNum",0)),sp_user.getString("Password","0"));
+                    showToast("自动登录成功");
+                }
             }
         });
 
@@ -463,7 +476,7 @@ public class MainActivity extends AppCompatActivity
             //判断点击了注册
         }else if(id == R.id.nav_register){
             if(logflag==true){
-                Toast.makeText(MainActivity.this,"已登录，无法注册",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,"已登录，无法注册,请先退出登陆",Toast.LENGTH_SHORT).show();
             }else{
                 Intent intent=new Intent(MainActivity.this,RegisterActivity.class);
                 startActivity(intent);

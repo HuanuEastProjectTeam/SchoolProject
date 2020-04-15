@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener{
     private View layout1,layout2,layout3,layout4,layout5,layout6;
-    private Button bu1;
+    private Button bu1,btn_QuitLogin;
     private EditText edit;
     private TextView textView;
     Boolean dianji=false;
@@ -31,6 +31,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         layout5=findViewById(R.id.number);
         layout6=findViewById(R.id.address);
         bu1=(Button)findViewById(R.id.fanhui);
+        btn_QuitLogin=findViewById(R.id.QuitLogin_Button);
         textView=findViewById(R.id.touxiang_text);      //YQ:10.16:定位由原来用户名一行改为定位到头像边上的用户名
         layout1.setOnClickListener(this);
       //  layout2.setOnClickListener(this);
@@ -39,13 +40,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         layout5.setOnClickListener(this);
         layout6.setOnClickListener(this);
         bu1.setOnClickListener(this);
-          //提取在yonghuming文件里提取数据
-
-            SharedPreferences sp = getSharedPreferences("yonghuming", MODE_PRIVATE);//设置可以调用context模式打开文件yonghuming
-            String yonghuming = sp.getString("data", "").toString();
-            Log.e("MessageActivity", yonghuming);//打印测试
-            textView.setText(yonghuming);
-
+        btn_QuitLogin.setOnClickListener(this);
 
     }
     //监听物理返回键实现效果
@@ -63,7 +58,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
             }
             //点击了用户名
-            case R.id.touxiang_text:{           //YQ:10.16:更改为头像边上的用户名
+            case R.id.touxiang_text:{
                 dianji=true;
                 Intent intent1=new Intent(MessageActivity.this,YonghumingActivity.class);
                 startActivity(intent1);
@@ -94,6 +89,13 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(intent1);
                 break;
             }
+            case R.id.QuitLogin_Button:{
+                MainActivity.logflag = false;
+                finish();
+                break;
+            }
+            default:
+                break;
         }
 
     }

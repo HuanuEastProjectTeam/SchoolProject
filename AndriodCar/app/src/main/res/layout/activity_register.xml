@@ -33,7 +33,7 @@
             android:textColor="@color/heise"
             android:textSize="19sp" />
         <Button
-            android:id="@+id/register_ToRegister"
+            android:id="@+id/register_ToLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

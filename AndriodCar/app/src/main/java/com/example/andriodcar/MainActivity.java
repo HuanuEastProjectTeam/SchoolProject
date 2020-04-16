@@ -123,10 +123,8 @@ public class MainActivity extends AppCompatActivity
     static Connect ct;
 
     //数据持久化操作对象
-    public SharedPreferences sp_user = getSharedPreferences("user", Context.MODE_PRIVATE);
+    public SharedPreferences sp_user;
 
-    //临时储存登录后用户信息
-    public static UserOrdinary userOrdinary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,14 +225,25 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //创建储存数据对象
+        sp_user = getSharedPreferences("user", Context.MODE_PRIVATE);
+
+        //与服务器建立连接，并且自动登陆
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 ct = new Connect();
                 ct.SetUserSharePreference(sp_user);
                 if(sp_user.getBoolean("logflag",false)){
-                    ct.login(String.valueOf(sp_user.getInt("PhoneNum",0)),sp_user.getString("Password","0"));
+                    ct.login(String.valueOf(sp_user.getInt("PhoneNum",123)),sp_user.getString("Password","123"));
+                    Looper.prepare();
                     showToast("自动登录成功");
+                    logflag=true;
+                    Looper.loop();
+                }else{
+                    Looper.prepare();
+                    showToast("用户尚未登陆");
+                    Looper.loop();
                 }
             }
         });
@@ -459,7 +468,7 @@ public class MainActivity extends AppCompatActivity
             }
             //判断点击了信息
         } else if (id == R.id.nav_slideshow) {
-            if(logflag==false){
+            if(logflag==true){
                 Intent intent=new Intent(MainActivity.this,MessageActivity.class);
                 startActivity(intent);
             }else{
@@ -481,6 +490,9 @@ public class MainActivity extends AppCompatActivity
                 Intent intent=new Intent(MainActivity.this,RegisterActivity.class);
                 startActivity(intent);
             }
+        }else if(id == R.id.nav_shezhi){
+            Intent intent = new Intent(this,ShezhiActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

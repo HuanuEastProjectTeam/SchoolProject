@@ -87,7 +87,7 @@
                     android:layout_height="40dp"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="请输入账户名或电话号码" />
+                    android:hint="请输入电话号码" />
 
         </LinearLayout>
         <LinearLayout

@@ -1,6 +1,7 @@
 package com.example.andriodcar;
 
 import android.content.Intent;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import static com.example.andriodcar.MainActivity.logflag;
 import static com.example.andriodcar.MainActivity.threadPoolExecutor;
 
 public class LogInActivity extends AppCompatActivity implements View.OnClickListener {
@@ -56,13 +58,27 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(intent);
                 break;
             }
-            case R.id.confirm_btn:{
-                threadPoolExecutor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        ct.login(et_name.getText().toString(),et_password.getText().toString());
-                    }
-                });
+            case R.id.Login_ConfirmButton:{
+                if(!et_name.getText().toString().trim().equals("")&&!et_password.getText().toString().trim().equals("")){   //确认用户名和密码栏不为空
+                    threadPoolExecutor.execute(new Runnable() {     //往线程池中加入线程
+                        @Override
+                        public void run() {
+                            if(ct.login(et_name.getText().toString(),et_password.getText().toString())){
+                                Looper.prepare();       //在子线程中使用toast
+                                Toast.makeText(LogInActivity.this,"登陆成功",Toast.LENGTH_SHORT).show();
+                                finish();
+                                Looper.loop();
+                            }else{
+                                Looper.prepare();
+                                Toast.makeText(LogInActivity.this,"登陆失败，用户名不存在或密码错误",Toast.LENGTH_SHORT).show();
+                                Looper.loop();
+                            }
+                        }
+                    });
+
+                }else{
+                    Toast.makeText(this,"用户名或密码为空",Toast.LENGTH_SHORT).show();
+                }
             }
             default:
                 break;

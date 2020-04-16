@@ -179,7 +179,7 @@ public class Connect  {
      * @param name 用户名
      * @param password  登陆密码
      */
-    public void login(String name,String password){
+    public boolean login(String name,String password){
         JSONObject job = new JSONObject();  //创建一个json对象存放login信息
         job.put("name",name);
         job.put("passWord",password);
@@ -189,19 +189,24 @@ public class Connect  {
         String Msend = search("login",job); //用本类的search方法将json对象转换为json字符串
         sendMessage(Msend);
         String reply = receiveMessage();    //获取服务器返回信息
-        Log.i("Connect","login successful");
-        Log.i(TAG,"reply:"+reply);
-        UserOrdinary uo = JSON.parseObject(reply,UserOrdinary.class);    //将服务器返回的消息解码为user类
-        Log.i(TAG,"user phone number:"+uo.getPhoneNum());
-        Log.i(TAG,"user password:"+uo.getPassword());
+        JSONObject replyjob = JSONObject.parseObject(reply);
+        if(replyjob.get("sign")!=null && replyjob.get("sign").toString().equals("default")){
+            MainActivity.logflag=false;
+            return false;
+        }else{
+            Log.i("Connect","login successful");
+            Log.i(TAG,"reply:"+reply);
+            UserOrdinary uo = JSON.parseObject(reply,UserOrdinary.class);    //将服务器返回的消息解码为user类
 
-        MainActivity.logflag = true;        //设置当前登录状态
-        MainActivity.userOrdinary = uo;
-        editor_user.putBoolean("logflag",true);
-        editor_user.putInt("PhoneNum",uo.getPhoneNum());     //保存登录信息，只保存登陆名和密码，下次开启app重新登陆
-        editor_user.putString("Password",uo.getPassword());
-        editor_user.apply();
+            MainActivity.logflag = true;        //设置当前登录状态
+            editor_user.putBoolean("logflag",true);
+            editor_user.putInt("PhoneNum",uo.getPhoneNum());     //保存登录信息，只保存登陆名和密码，下次开启app重新登陆
+            editor_user.putString("Password",uo.getPassword());
+            editor_user.putString("userinfo",reply);
+            editor_user.apply();
 
+            return true;
+        }
     }
 
     public void Register(String phoneNum,String password){

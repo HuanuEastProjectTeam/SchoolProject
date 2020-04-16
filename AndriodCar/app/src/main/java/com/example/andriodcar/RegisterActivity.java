@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import static com.example.andriodcar.MainActivity.threadPoolExecutor;
 
@@ -38,12 +39,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view){
         switch (view.getId()){
             case R.id.register_ConfirmButton:{
-                threadPoolExecutor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        ct.Register(et_name.getText().toString(),et_password.getText().toString());
-                    }
-                });
+                if(et_name.getText().toString().trim().equals("")){
+                    Toast.makeText(this,"用户名为空！",Toast.LENGTH_SHORT).show();
+                }else if(et_password.getText().toString().trim().equals("")){
+                    Toast.makeText(this,"密码为空！",Toast.LENGTH_SHORT).show();
+                }else if(!et_passwordConfirm.getText().toString().equals(et_password.getText().toString())){
+                    Toast.makeText(this,"两次输入密码不同",Toast.LENGTH_SHORT).show();
+                }else{
+                    threadPoolExecutor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            ct.Register(et_name.getText().toString(),et_password.getText().toString());
+                        }
+                    });
+                }
                 break;
             }
             case R.id.register_fanhui:{

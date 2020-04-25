@@ -39,7 +39,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         btn_fanhui.setOnClickListener(this);
         btn_ToRegister.setOnClickListener(this);
         btn_Forget.setOnClickListener(this);
-        ct = MainActivity.ct;
+        ct = Connect.getConncet();
     }
 
     @Override

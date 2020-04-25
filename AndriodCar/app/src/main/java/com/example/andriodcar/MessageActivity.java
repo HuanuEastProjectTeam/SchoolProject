@@ -18,7 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener{
     private View layout1,layout2,layout3,layout4,layout5,layout6;
-    private Button bu1,btn_QuitLogin;
+    private Button bu1,btn_QuitLogin,btn_ChangePassword;
     private EditText edit;
     private TextView tv_name,tv_shiming,tv_xingbie,tv_phonenumber,tv_suozaidi,tv_id;
     Boolean dianji=false;
@@ -37,6 +37,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         layout6=findViewById(R.id.address);
         bu1= findViewById(R.id.Msg_fanhui);
         btn_QuitLogin=findViewById(R.id.Msg_QuitLogin_Button);
+        btn_ChangePassword = findViewById(R.id.Msg_ChangePassword);
         tv_name =findViewById(R.id.Msg_touxiang_text);      //用户名
         tv_id=findViewById(R.id.Msg_touxiang_id);
         tv_phonenumber=findViewById(R.id.Msg_phonenumber);
@@ -51,6 +52,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         layout6.setOnClickListener(this);
         bu1.setOnClickListener(this);
         btn_QuitLogin.setOnClickListener(this);
+        btn_ChangePassword.setOnClickListener(this);
         sp_user = getSharedPreferences("user", Context.MODE_PRIVATE);
         UnPack();
     }
@@ -93,17 +95,18 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             }
             //判断点击了返回
             case R.id.Msg_fanhui:{
-                Intent intent=new Intent(this,MainActivity.class); //跳转到主界面
-                startActivity(intent);
                 finish();
                 break;
             }
             case R.id.Msg_QuitLogin_Button:{
-                Intent intent=new Intent(this,MainActivity.class); //跳转到主界面
-                startActivity(intent);
                 MainActivity.logflag = false;
                 sp_user.edit().putBoolean("logflag",false).apply();
                 finish();
+                break;
+            }
+            case R.id.Msg_ChangePassword:{
+                Intent intent = new Intent(this,ChangePasswordActivity.class);
+                startActivity(intent);
                 break;
             }
             default:

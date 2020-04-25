@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                ct = new Connect();
+                ct = Connect.getConncet();
                 ct.SetUserSharePreference(sp_user);
                 if(sp_user.getBoolean("logflag",false)){
                     ct.login(String.valueOf(sp_user.getInt("PhoneNum",123)),sp_user.getString("Password","123"));

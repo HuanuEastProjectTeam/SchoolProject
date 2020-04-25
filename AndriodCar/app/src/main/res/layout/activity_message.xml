@@ -265,6 +265,17 @@
     </RelativeLayout>
 
     <Button
+        android:id="@+id/Msg_ChangePassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:background="@drawable/btn_bg_bule"
+        android:text="修改密码"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"/>
+    <Button
         android:id="@+id/Msg_QuitLogin_Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

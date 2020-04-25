@@ -1,6 +1,7 @@
 package com.example.andriodcar;
 
 import android.content.Intent;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -33,7 +34,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         btn_ConfirmButton.setOnClickListener(this);
         btn_fanhui.setOnClickListener(this);
         btn_ToLogin.setOnClickListener(this);
-        ct = MainActivity.ct;
+        ct = Connect.getConncet();
     }
 
     public void onClick(View view){
@@ -49,7 +50,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     threadPoolExecutor.execute(new Runnable() {
                         @Override
                         public void run() {
-                            ct.Register(et_name.getText().toString(),et_password.getText().toString());
+                            if(ct.Register(et_name.getText().toString(),et_password.getText().toString())){
+                                Looper.prepare();       //在子线程中使用toast
+                                Toast.makeText(RegisterActivity.this,"注册成功，已自动登陆",Toast.LENGTH_SHORT).show();
+                                finish();
+                                Looper.loop();
+                            }else{
+                                Looper.prepare();
+                                Toast.makeText(RegisterActivity.this,"注册失败",Toast.LENGTH_SHORT).show();
+                                Looper.loop();
+                            }
                         }
                     });
                 }

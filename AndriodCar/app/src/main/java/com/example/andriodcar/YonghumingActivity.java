@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -19,7 +18,7 @@ public class YonghumingActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_yonghuming);
+        setContentView(R.layout.activity_changename);
         bu1=(Button)findViewById(R.id.fanhui);
         bu2=(Button)findViewById(R.id.quedin);
         editText=(EditText)findViewById(R.id.shuru);

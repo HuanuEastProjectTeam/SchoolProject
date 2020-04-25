@@ -25,7 +25,7 @@
             android:id="@+id/quedin"
             android:layout_height="50dp"
             android:layout_width="wrap_content"
-            android:text="确定"
+            android:text=""
             android:gravity="center"
             android:textColor="@color/heise"
             android:textSize="19sp"
@@ -39,5 +39,17 @@
         android:layout_height="50dp"
         android:hint="请输入新用户名"
         />
+
+    <Button
+        android:id="@+id/Msg_ChangePassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:background="@drawable/btn_bg_bule"
+        android:text="确认修改"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"/>
 
 </LinearLayout>

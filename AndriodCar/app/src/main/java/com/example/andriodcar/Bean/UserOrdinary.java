@@ -11,6 +11,7 @@ public class UserOrdinary {
     private String idNum;       //身份证号
     private int iden;       //认证标识
     private String parkSpaceNum;        //停车位号码
+    private String headPortrait;        //头像路径
 
     public int getId() {
         return id;
@@ -90,5 +91,13 @@ public class UserOrdinary {
 
     public void setParkSpaceNum(String parkSpaceNum) {
         this.parkSpaceNum = parkSpaceNum;
+    }
+
+    public String getHeadPortrait() {
+        return headPortrait;
+    }
+
+    public void setHeadPortrait(String headPortrait) {
+        this.headPortrait = headPortrait;
     }
 }

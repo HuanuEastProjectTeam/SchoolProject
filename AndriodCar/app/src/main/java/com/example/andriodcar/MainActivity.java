@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
+import com.example.andriodcar.Bean.NewMessage;
 import com.example.andriodcar.Bean.UserOrdinary;
 import com.example.andriodcar.Map.MapActivity;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -136,6 +137,8 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         //初始化权限
         judgePermission();
+
+        ct = Connect.getConncet();      //获取网络操作对象
       /*
       首页信封图标点击事件
 
@@ -232,7 +235,7 @@ public class MainActivity extends AppCompatActivity
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                ct = Connect.getConncet();
+
                 ct.SetUserSharePreference(sp_user);
                 if(sp_user.getBoolean("logflag",false)){
                     ct.login(String.valueOf(sp_user.getInt("PhoneNum",123)),sp_user.getString("Password","123"));
@@ -508,12 +511,37 @@ public class MainActivity extends AppCompatActivity
      * 初始化事件
      */
     private void initEvent() {
-        imageInfoList = new ArrayList<>();
-        imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-        imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-        imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-        imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
-        imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                imageInfoList = new ArrayList<>();
+                /*
+                imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+                imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+                imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+                imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
+                imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
+
+                */
+                NewMessage NM1 = ct.newMessage(1);
+                NewMessage NM2 = ct.newMessage(2);
+                NewMessage NM3 = ct.newMessage(3);
+
+                if(null!=NM1.getMessageImage() &&null!=NM1.getMessageTitle()){
+                    imageInfoList.add(new ImageInfo(1, NM1.getMessageTitle(), NM1.getMessageImage(),"https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+                }
+                if(null!=NM2.getMessageImage() &&null!=NM2.getMessageTitle()){
+                    imageInfoList.add(new ImageInfo(2, NM2.getMessageTitle(), NM2.getMessageImage(), "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+                }
+                if(null!=NM3.getMessageImage() &&null!=NM3.getMessageTitle()){
+                    imageInfoList.add(new ImageInfo(3, NM1.getMessageTitle(), NM3.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+                }
+
+
+
+            }
+        });
+
     }
 
     /**

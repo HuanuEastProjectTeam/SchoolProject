@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.andriodcar.Bean.NewMessage;
 import com.example.andriodcar.Bean.UserOrdinary;
 
 
@@ -163,6 +164,8 @@ public class Connect  {
                     job.put("login","1");
                     break;
                 case "newMessage":  //新闻信息查询
+                    Log.i(TAG,"开始编码newMessage内容");
+                    job.put("newMessage","1");
                     break;
                 case "PersonMessage":   //个人信息查询
                     break;
@@ -227,6 +230,23 @@ public class Connect  {
     }
 
 
+    /**
+     * 获取新闻
+     * @param messageId 新闻框id
+     */
+    public NewMessage newMessage(int messageId){
+        JSONObject job = new JSONObject();
+        job.put("messageId",messageId);
+        job.put("newMessage","1");
+        job.put("type","search");
+
+        String Msend = "";
+        Msend = updata("newMessage",job);       //转换为字符串
+        sendMessage(Msend);
+        String reply = receiveMessage();    //获取服务器返回信息
+        NewMessage newMessage = JSON.parseObject(reply,NewMessage.class);       //转换为NewMessage JavaBean
+        return newMessage;
+    }
 
     /**
      * 包装update操作类型json数据

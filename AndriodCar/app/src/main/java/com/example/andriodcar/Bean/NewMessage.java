@@ -1,20 +1,20 @@
 package com.example.andriodcar.Bean;
 
 /**
- * ������
- * @author ����
+ * ??????
+ * @author ????
  * @date 2020/2/12
  */
 public class NewMessage {
-	//���ű��
+	//??????
 	private int messageId;
-	//���ű���
+	//???????
 	private String messageTitle;
-	//��������
+	//????????
 	private String messagecontent;
-	//����ͼƬ
+	//??????
 	private String messageImage;
-	//����ʱ��
+	//???????
 	private String messageTime;
 	public int getMessageId() {
 		return messageId;

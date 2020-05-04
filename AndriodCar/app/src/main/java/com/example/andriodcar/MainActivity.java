@@ -1,16 +1,24 @@
 package com.example.andriodcar;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.renderscript.Allocation;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +39,8 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,9 +65,12 @@ import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -101,8 +114,6 @@ public class MainActivity extends AppCompatActivity
     // 图片数据，包括图片标题、图片链接、数据、点击要打开的网站（点击打开的网页或一些提示指令）
     private List<ImageInfo> imageInfoList;
 
-
-
     //二维码扫描
     private Button btn_sacn;
    //缴费
@@ -111,6 +122,8 @@ public class MainActivity extends AppCompatActivity
     private  Button btn_carmap;
     //帮助
     private Button  btn_help;
+
+    ImageView nav_imageview;
 
     //显示信息
     private RelativeLayout relativeLayoutOne;
@@ -126,6 +139,9 @@ public class MainActivity extends AppCompatActivity
     //数据持久化操作对象
     public SharedPreferences sp_user;
 
+    public static Bitmap HeadPortraitImage = null;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +155,7 @@ public class MainActivity extends AppCompatActivity
         judgePermission();
 
         ct = Connect.getConncet();      //获取网络操作对象
+        Connect.SetContext(this);
       /*
       首页信封图标点击事件
 
@@ -167,6 +184,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setItemIconTintList(null);//显示菜单图标
         navigationView.setItemTextColor(null);
         navigationView.setNavigationItemSelectedListener(this);
+
+        nav_imageview = findViewById(R.id.nav_imageView);
 
         /*图片方法初始化*/
         initView();
@@ -231,6 +250,9 @@ public class MainActivity extends AppCompatActivity
         //创建储存数据对象
         sp_user = getSharedPreferences("user", Context.MODE_PRIVATE);
 
+
+
+
         //与服务器建立连接，并且自动登陆
         threadPoolExecutor.execute(new Runnable() {
             @Override
@@ -242,6 +264,27 @@ public class MainActivity extends AppCompatActivity
                     Looper.prepare();
                     showToast("自动登录成功");
                     logflag=true;
+                    if(sp_user.getString("HeadPortraitPath",null)!=null){       //获取已经保存的头像
+                        File file = new File((sp_user.getString("HeadPortraitPath", null)));
+                        HeadPortraitImage = BitmapFactory.decodeFile(file.getPath());
+                        Log.i("Connect", "读取到本地头像，载入完毕");
+
+                    }else{                  //没有保存的头像则从云端获取
+                        try {
+                            HeadPortraitImage = ct.getHeadPortrait();
+                            File file = new File(getFilesDir().getPath());
+                            File f = new File(file, "head.PNG");
+                            f.createNewFile();
+                            FileOutputStream fos = new FileOutputStream(f);
+                            HeadPortraitImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                            fos.flush();
+                            Log.i("Connect", "save HeadPortrait file successful");
+                            sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
+                            fos.close();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
                     Looper.loop();
                 }else{
                     Looper.prepare();
@@ -250,6 +293,15 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+        if(logflag){
+            File file = new File(getFilesDir().getPath());
+            File f = new File(file, "head.PNG");
+            if(f.exists()){
+                Bitmap bitmap = BitmapFactory.decodeFile(f.getPath());
+                nav_imageview.setImageBitmap(bitmap);
+            }
+        }
 
     }
     /**
@@ -375,28 +427,34 @@ public class MainActivity extends AppCompatActivity
         /*处理二维码扫描结果
                 */
 
-        if (requestCode == REQUEST_CODE) {
-            //处理扫描结果（在界面上显示）
-            if (null != data) {
-                Bundle bundle = data.getExtras();
-                if (bundle == null) {
-                    return;
-                }
-                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                    String jieGuo="http://www.feilonkji.xyz/";
-                    result = bundle.getString(CodeUtils.RESULT_STRING);//二维码解析结果
-                    if(result.equals(jieGuo)){
-                        Intent intent=new Intent(MainActivity.this,OpenLack.class);
-                        startActivity(intent);
+
+
+        switch (requestCode){
+            case REQUEST_CODE:{
+                //处理扫描结果（在界面上显示）
+                if (null != data) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle == null) {
+                        return;
                     }
-                    Toast.makeText(this, "解析结果:" + result, Toast.LENGTH_LONG).show();
-                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
-                    Toast.makeText(MainActivity.this, "解析二维码失败", Toast.LENGTH_LONG).show();
-                }
-                else{
-                    Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+                    if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                        String jieGuo="http://www.feilonkji.xyz/";
+                        result = bundle.getString(CodeUtils.RESULT_STRING);//二维码解析结果
+                        if(result.equals(jieGuo)){
+                            Intent intent=new Intent(MainActivity.this,OpenLack.class);
+                            startActivity(intent);
+                        }
+                        Toast.makeText(this, "解析结果:" + result, Toast.LENGTH_LONG).show();
+                    } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                        Toast.makeText(MainActivity.this, "解析二维码失败", Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+                    }
                 }
             }
+            default:
+                break;
         }
     }
 
@@ -445,6 +503,8 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -511,18 +571,13 @@ public class MainActivity extends AppCompatActivity
      * 初始化事件
      */
     private void initEvent() {
+        imageInfoList = new ArrayList<>();
+        /*
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                imageInfoList = new ArrayList<>();
-                /*
-                imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-                imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-                imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-                imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
-                imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
 
-                */
+
                 NewMessage NM1 = ct.newMessage(1);
                 NewMessage NM2 = ct.newMessage(2);
                 NewMessage NM3 = ct.newMessage(3);
@@ -541,6 +596,15 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+        */
+
+                imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+                imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+                imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+                imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
+                imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
+
+
 
     }
 
@@ -729,7 +793,5 @@ public class MainActivity extends AppCompatActivity
         }
         //LocationClient.reStart();
     }
-
-
 
 }

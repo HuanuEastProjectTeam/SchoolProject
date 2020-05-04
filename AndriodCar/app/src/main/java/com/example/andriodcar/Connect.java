@@ -3,19 +3,24 @@ package com.example.andriodcar;
 import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.mapframework.commonlib.utils.IO;
 import com.example.andriodcar.Bean.NewMessage;
 import com.example.andriodcar.Bean.UserOrdinary;
 
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.net.Socket;
 
-public class Connect  {
+public class Connect {
 
     private String ip = "120.79.87.21";
     private int imageUploadPort = 5423;
@@ -23,19 +28,28 @@ public class Connect  {
 
     private static String TAG = "Connect";
 
+    //传入一个context对象用于相关操作
+    private static Context context;
+
     //普通数据交互接口
     private Socket sc = null;
     //图片交互接口
     private Socket ImageSocket = null;
 
+    //普通交互流
     private OutputStream dout = null;
     private InputStreamReader din = null;
 
-    private JSONObject jsonData = null;
+    //图片交互流
+    private InputStream imageInputStream = null;
+    private DataOutputStream imageFileOutputSteam = null;
 
     //数据持久化操作
-    private SharedPreferences sp_user;
-    private SharedPreferences.Editor editor_user;
+    private static SharedPreferences sp_user;
+    private static SharedPreferences.Editor editor_user;
+
+
+
 
     private static Connect ct = new Connect();      //单例模式，装载类时强制初始化
 
@@ -47,13 +61,17 @@ public class Connect  {
 
     }
 
+    /**
+     * 初始化图片上传连接
+     */
     private void InitConnect(){
         try {
             sc = new Socket(ip,port);       //通过socket连接服务器
             din = new InputStreamReader(sc.getInputStream(),"gb2312");
             dout = sc.getOutputStream();
+            sc.setSoTimeout(10000);
             if(sc!=null){
-                Log.i(TAG,"connect server successful");
+                Log.i(TAG,"connect image port successful");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,12 +80,18 @@ public class Connect  {
 
     public static Connect getConncet(){
         return ct;
+    }       //单例模式获取对象
+
+    public static void Init(Context context){
+        SetContext(context);
+        SetUserSharePreference(context.getSharedPreferences("user", Context.MODE_PRIVATE));
     }
 
     /**
      * 传入sharedpreference对象，用于保存用户数据
      */
-    public void SetUserSharePreference(SharedPreferences sharedPreferences){
+    public static void SetUserSharePreference(SharedPreferences sharedPreferences){
+
         if(sharedPreferences != null){
             sp_user = sharedPreferences;
             editor_user = sp_user.edit();
@@ -77,33 +101,104 @@ public class Connect  {
     }
 
     /**
+     *
+     */
+    public static void SetContext(Context ct){
+        context = ct;
+    }
+
+    /**
      * 初始化图片上传接口
      */
-    public void InitImageIO(){
+    public boolean InitImageIO(){
         try {
             ImageSocket = new Socket(ip,imageUploadPort);
-            if(ImageSocket!=null){
-                Log.i(TAG,"ImageUpLoad Ready");
+            if(ImageSocket.isConnected()){
+                imageFileOutputSteam = new DataOutputStream(ImageSocket.getOutputStream());
+                if(imageFileOutputSteam != null){
+                    imageInputStream = ImageSocket.getInputStream();
+                    if(imageInputStream!=null){
+                        Log.i(TAG,"ImageIO Ready");
+                        return true;
+                    }
+                }else{
+                    Log.i(TAG,"imageOutputStream is null");
+                }
+            }else{
+                Log.i(TAG,"image socket is null");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
+
+    public void CloseImageIO(){
+        if(ImageSocket.isConnected()){
+            try {
+                ImageSocket.close();
+                if(imageFileOutputSteam != null)
+                    imageFileOutputSteam.close();
+                if(imageInputStream != null)
+                    imageInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(ImageSocket.isClosed()){
+            Log.i(TAG,"ImageUpLoad Close");
+        }
+    }
+
 
     /**
      * 上传图片
      * 上传图片前必须传输用户信息，必须包含有name
      */
-    public void UploadImage(){
-
+    public boolean UploadImage(Bitmap image_toSend){
+        try {
+            if(InitImageIO()){
+                Log.i(TAG,"start send image");
+                image_toSend.compress(Bitmap.CompressFormat.PNG, 100, imageFileOutputSteam);        //把图片按参数压缩后压入输出流
+                imageFileOutputSteam.flush();
+                Thread.sleep(1000);             //休眠一下线程等待传输完成
+                Log.i(TAG,"send image successful");
+                CloseConnect();
+                return true;
+            }else{
+                Log.i(TAG,"Init imageIO failed");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        Log.i(TAG,"send image failed");
+        return false;
     }
 
     /**
      * 图片输入
-     * @return 如果图片不为null则返回true
+     * @return 返回收到的bitmap图片
      */
-    public boolean ReceiveImage(){
-        return true;
+    public Bitmap ReceiveImage(){
+        Bitmap image_receive = null;
+        try{
+            if(InitImageIO()){
+                try {
+                    Thread.sleep(2000);     //发送获取头像申请后要等待服务端上传图片
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+                Log.i(TAG,"start receive image message");
+                image_receive = BitmapFactory.decodeStream(imageInputStream);       //从流中获取图片
+                if(image_receive!=null)
+                    Log.i(TAG,"receive image successful");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        CloseImageIO();
+        return image_receive;
     }
 
     /**
@@ -113,13 +208,13 @@ public class Connect  {
     public void sendMessage(String message){
         InitConnect();      //发消息的时候连接服务器，收到消息后关闭
         try {
-            if(dout != null || message != null){        //判断输出流或者消息是否为空，为空的话会产生nullpoint错误
+            if(dout != null && message != null ){        //判断输出流或者消息是否为空，为空的话会产生nullpoint错误
                 message = message + "\n";       //末尾加上换行让服务器端有消息返回
                 byte[] me = message.getBytes();
                 dout.write(me);
                 dout.flush();
             }else{
-                Log.d("Connect","The message to be sent is empty");
+                Log.d("Connect","The message to be sent is empty or have no connect");
             }
             Log.i(TAG,"send message successful");
         } catch (IOException e) {
@@ -152,7 +247,7 @@ public class Connect  {
      * @param source 包含信息的javabean
      * @return 返回source转换的json格式的字符串
      */
-    public String search(String type,Object source){
+    public String search(String type, Object source){
         JSONObject job = null;
         String jstr = null;
         Log.i(TAG,"开始查找编码操作类型");
@@ -195,7 +290,7 @@ public class Connect  {
      * @param name 用户名
      * @param password  登陆密码
      */
-    public boolean login(String name,String password){
+    public boolean login(String name, String password){
         JSONObject job = new JSONObject();  //创建一个json对象存放login信息
         job.put("name",name);
         job.put("password",password);
@@ -210,11 +305,11 @@ public class Connect  {
             replyjob = JSONObject.parseObject(reply);
         }
         if(replyjob!=null && replyjob.get("sign")!=null && replyjob.get("sign").toString().equals("default")){
+            Log.i("Connect", "login failed");
             MainActivity.logflag=false;
             return false;
         }else if (reply != null && !reply.trim().equals("")) {
             Log.i("Connect", "login successful");
-            Log.i(TAG, "reply:" + reply);
             UserOrdinary uo = JSON.parseObject(reply, UserOrdinary.class);    //将服务器返回的消息解码为user类
 
             MainActivity.logflag = true;        //设置当前登录状态
@@ -249,10 +344,43 @@ public class Connect  {
     }
 
     /**
+     * 获取当前账号头像
+     */
+    public Bitmap getHeadPortrait(){
+        JSONObject job = new JSONObject();
+        job.put("name", String.valueOf(sp_user.getInt("PhoneNum",123)));            //获取保存在本地的账户名
+        job.put("upHeadPortrait","2");
+        job.put("type","search");
+        job.put("password",sp_user.getString("Password","1234"));
+        job.put("login","1");
+
+        String Msend = "";
+        Msend = updata("newMessage",job);       //转换为字符串
+        sendMessage(Msend);
+        String reply = receiveMessage();    //获取服务器返回信息
+
+        Bitmap ReceiveImage = ReceiveImage();
+        try {
+            File file = new File(context.getFilesDir().getPath());
+            File f = new File(file, "head.PNG");
+            f.createNewFile();
+            FileOutputStream fos = new FileOutputStream(f);
+            ReceiveImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            Log.i("Connect", "save HeadPortrait file successful");
+            sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
+            fos.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return ReceiveImage;
+    }
+
+    /**
      * 包装update操作类型json数据
      * 参数用法同search方法
      */
-    public String updata(String type,Object source){
+    public String updata(String type, Object source){
         JSONObject job = null;
         String jstr = null;
         Log.i(TAG,"开始查找编码操作类型");
@@ -293,7 +421,7 @@ public class Connect  {
      * @param password  密码
      * @return  是否注册成功
      */
-    public boolean Register(String phoneNum,String password){
+    public boolean Register(String phoneNum, String password){
         UserOrdinary uo = new UserOrdinary();
         uo.setPhoneNum(Integer.parseInt(phoneNum));
         uo.setPassword(password);
@@ -333,7 +461,7 @@ public class Connect  {
      */
     public boolean ChangePassword(String newPassword){      //必须要有type:updata,updataPassword:1,name:账号，newUserMessage：新密码
         JSONObject uo = new JSONObject();
-        uo.put("name",String.valueOf(sp_user.getInt("PhoneNum",123)));      //获取保存在本地的账户名
+        uo.put("name", String.valueOf(sp_user.getInt("PhoneNum",123)));      //获取保存在本地的账户名
         uo.put("newPassword",newPassword);
         uo.put("type","updata");
         uo.put("updataPassword","1");
@@ -360,9 +488,30 @@ public class Connect  {
             job.put("Password",newPassword);
             jstr = job.toJSONString();
             editor_user.putString("userinfo",jstr);
+            editor_user.apply();
             return true;
         }
         return false;
+    }
+
+    /**
+     * 修改头像
+     */
+    public void upHeadPortrait(Bitmap bitmap){       //先发送头像更改请求，然后再上传图片
+        JSONObject job = new JSONObject();
+        job.put("name", String.valueOf(sp_user.getInt("PhoneNum",123)));      //获取保存在本地的账户名
+        job.put("type","updata");
+        job.put("upHeadPortrait","1");
+        job.put("password",sp_user.getString("Password","1234"));
+        job.put("login","1");
+
+        String Msend = updata("upHeadPortrait",job);    //先发送修改头像请求
+        sendMessage(Msend);
+        CloseConnect();         //没设置回复直接关闭接口
+        //String reply = receiveMessage();
+        //Log.i(TAG,reply);
+        UploadImage(bitmap);
+
     }
 
     /**
@@ -384,5 +533,8 @@ public class Connect  {
         }
         Log.i(TAG,"关闭连接");
     }
+
+
+
 
 }

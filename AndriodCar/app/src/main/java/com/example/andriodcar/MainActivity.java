@@ -81,20 +81,22 @@ import java.util.concurrent.Executors;
 
 import image.ImageCarousel;
 import image.ImageInfo;
+
 import com.example.andriodcar.Bean.Userbean;
+
 import utils.javautils;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener , View.OnClickListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     //日志提示信息
     private final static String log = "我是日志信息：";
 
     //登录标记
-    public static boolean logflag=false;
+    public static boolean logflag = false;
 
     //扫码结果集
-    String result=null;
+    String result = null;
 
     /**
      * 扫描跳转Activity RequestCode
@@ -116,14 +118,15 @@ public class MainActivity extends AppCompatActivity
 
     //二维码扫描
     private Button btn_sacn;
-   //缴费
+    //缴费
     private Button btn_money;
     //地图
-    private  Button btn_carmap;
+    private Button btn_carmap;
     //帮助
-    private Button  btn_help;
+    private Button btn_help;
 
-    ImageView nav_imageview;
+    //头像
+    public ImageView nav_imageview;
 
     //显示信息
     private RelativeLayout relativeLayoutOne;
@@ -139,8 +142,8 @@ public class MainActivity extends AppCompatActivity
     //数据持久化操作对象
     public SharedPreferences sp_user;
 
-    public static Bitmap HeadPortraitImage = null;
 
+    public static MainHandler mainHandler;        //子线程中不能进行UI更新操作，必需使用handler
 
 
     @Override
@@ -185,25 +188,25 @@ public class MainActivity extends AppCompatActivity
         navigationView.setItemTextColor(null);
         navigationView.setNavigationItemSelectedListener(this);
 
-        nav_imageview = findViewById(R.id.nav_imageView);
+
 
         /*图片方法初始化*/
         initView();
         initEvent();
-        imageStart();
+
 
         DialogUIUtils.init(this);
 
         ZXingLibrary.initDisplayOpinion(this);
         //二维码扫描
-        btn_sacn=findViewById(R.id.scan);
+        btn_sacn = findViewById(R.id.scan);
         btn_sacn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(logflag){//未登录logflag为假
-                    Toast.makeText(MainActivity.this,"请登录",Toast.LENGTH_SHORT).show();
+                if (logflag) {//未登录logflag为假
+                    Toast.makeText(MainActivity.this, "请登录", Toast.LENGTH_SHORT).show();
 
-                }else{
+                } else {
                     Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
                     startActivityForResult(intent, REQUEST_CODE);
                 }
@@ -213,25 +216,25 @@ public class MainActivity extends AppCompatActivity
 
 
         //空闲车位的发布
-        btn_money=findViewById(R.id.money);
+        btn_money = findViewById(R.id.money);
         btn_money.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //跳转到发布停车位
-            //    Toast.makeText(MainActivity.this,"功能还在开发中····",Toast.LENGTH_SHORT).show();
-                Log.i(log,"进入空闲车位表单页面");
-                Intent intent = new Intent(MainActivity.this,FromCar.class);
+                //    Toast.makeText(MainActivity.this,"功能还在开发中····",Toast.LENGTH_SHORT).show();
+                Log.i(log, "进入空闲车位表单页面");
+                Intent intent = new Intent(MainActivity.this, FromCar.class);
                 startActivity(intent);
             }
         });
 
 
         //地图实现
-        btn_carmap=findViewById(R.id.carmap);
+        btn_carmap = findViewById(R.id.carmap);
         btn_carmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(MainActivity.this, MapActivity.class);
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
                 startActivity(intent);
             }
         });
@@ -242,7 +245,7 @@ public class MainActivity extends AppCompatActivity
         btn_help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,HelpActivity.class);
+                Intent intent = new Intent(MainActivity.this, HelpActivity.class);
                 startActivity(intent);
             }
         });
@@ -250,81 +253,87 @@ public class MainActivity extends AppCompatActivity
         //创建储存数据对象
         sp_user = getSharedPreferences("user", Context.MODE_PRIVATE);
 
+        mainHandler = new MainHandler(this);
 
-
+        nav_imageview = findViewById(R.id.nav_imageView);
 
         //与服务器建立连接，并且自动登陆
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
 
-                ct.SetUserSharePreference(sp_user);
-                if(sp_user.getBoolean("logflag",false)){
-                    ct.login(String.valueOf(sp_user.getInt("PhoneNum",123)),sp_user.getString("Password","123"));
+                ct.SetUserSharePreference(sp_user);         //传递sharepreference对象用于储存账号信息
+                if (sp_user.getBoolean("logflag", false)) {
+                    ct.login(String.valueOf(sp_user.getInt("PhoneNum", 123)), sp_user.getString("Password", "123"));       //登陆
                     Looper.prepare();
                     showToast("自动登录成功");
-                    logflag=true;
-                    if(sp_user.getString("HeadPortraitPath",null)!=null){       //获取已经保存的头像
-                        File file = new File((sp_user.getString("HeadPortraitPath", null)));
-                        HeadPortraitImage = BitmapFactory.decodeFile(file.getPath());
-                        Log.i("Connect", "读取到本地头像，载入完毕");
+                    logflag = true;
 
-                    }else{                  //没有保存的头像则从云端获取
-                        try {
-                            HeadPortraitImage = ct.getHeadPortrait();
-                            File file = new File(getFilesDir().getPath());
-                            File f = new File(file, "head.PNG");
-                            f.createNewFile();
-                            FileOutputStream fos = new FileOutputStream(f);
-                            HeadPortraitImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                            fos.flush();
-                            Log.i("Connect", "save HeadPortrait file successful");
-                            sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
-                            fos.close();
-                        }catch (IOException e){
-                            e.printStackTrace();
-                        }
-                    }
                     Looper.loop();
-                }else{
+                } else {
                     Looper.prepare();
                     showToast("用户尚未登陆");
                     Looper.loop();
                 }
+
+
             }
         });
 
-        if(logflag){
-            File file = new File(getFilesDir().getPath());
-            File f = new File(file, "head.PNG");
-            if(f.exists()){
-                Bitmap bitmap = BitmapFactory.decodeFile(f.getPath());
-                nav_imageview.setImageBitmap(bitmap);
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap;
+                if (sp_user.getString("HeadPortraitPath", null) != null) {       //获取已经保存的头像路径
+                    File file = new File((sp_user.getString("HeadPortraitPath", null)));
+                    bitmap = BitmapFactory.decodeFile(file.getPath());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("Connect", "读取到本地头像，载入完毕");
+                } else {                  //没有保存的头像则从云端获取
+                    bitmap = ct.getHeadPortrait();
+                    SaveBitmap(bitmap, "\"head.PNG\"");           //储存头像到本地
+
+                }
+                if (bitmap != null) {
+                    Message message = new Message();
+                    message.what = 2;
+                    message.obj = bitmap;
+                    mainHandler.sendMessage(message);                   //传递UI更新操作给handler
+                    Log.i("Connect", "send message to handler");
+                } else {
+                    Log.i("Connect", "no image find");
+                }
+
             }
-        }
+        });
+
 
     }
+
     /**
      * 首页和我的点击方法
      * 点击后分别显示首页界面和我的信息界面
      * 同时更换按钮活动图标
-     *
      */
-    public void indexAndmyMessage(View view){
+    public void indexAndmyMessage(View view) {
         //获得首页布局id
         LinearLayout linearLayout = findViewById(R.id.indexLayout);
         //获取信息页面布局id
         LinearLayout linearLayout1 = findViewById(R.id.myMessageLayout);
         //导航栏的文字控件
-        TextView textView =findViewById(R.id.toolbar_title);
-        switch (view.getId()){
-            case R.id.index_1 : {
+        TextView textView = findViewById(R.id.toolbar_title);
+        switch (view.getId()) {
+            case R.id.index_1: {
                 //默认进入软件首先展示首页
-                Log.i(log,"点击了首页");
+                Log.i(log, "点击了首页");
                 //设置图标,把首页设置为活跃状态
-                drawIndexAndMyMessageIcon(view.getId(),R.drawable.index_activity);
+                drawIndexAndMyMessageIcon(view.getId(), R.drawable.index_activity);
                 //把我的设置为停止状态，更改图标
-                drawIndexAndMyMessageIcon(R.id.my,R.drawable.mymessage);
+                drawIndexAndMyMessageIcon(R.id.my, R.drawable.mymessage);
                 //设置首页信息可见，占据空间
                 linearLayout.setVisibility(View.VISIBLE);
                 //隐藏我的信息页面
@@ -332,13 +341,13 @@ public class MainActivity extends AppCompatActivity
                 textView.setText("首页");
                 break;
             }
-            case R.id.my :{
+            case R.id.my: {
                 //点击了我的
-                Log.i(log,"点击了我的");
+                Log.i(log, "点击了我的");
                 //设置图标,把首页设置为停止状态
-                drawIndexAndMyMessageIcon(R.id.index_1,R.drawable.index);
+                drawIndexAndMyMessageIcon(R.id.index_1, R.drawable.index);
                 //把我的设置为活跃状态，更改图标
-                drawIndexAndMyMessageIcon(view.getId(),R.drawable.mymessage_activity);
+                drawIndexAndMyMessageIcon(view.getId(), R.drawable.mymessage_activity);
                 //设置首页不显示,留出空间
                 linearLayout.setVisibility(View.GONE);
                 //显示我的信息页面
@@ -352,30 +361,32 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 改变按钮图标
+     *
      * @param age1 按钮对象对应的int值
-     * @param age 图标对应的int值
+     * @param age  图标对应的int值
      */
-    public void drawIndexAndMyMessageIcon(int age1,int age){
+    public void drawIndexAndMyMessageIcon(int age1, int age) {
         Button buttonIndexMy = findViewById(age1);
         Drawable drawable = getResources().getDrawable(age);
-        drawable.setBounds(0,0,100,100);
-        buttonIndexMy.setCompoundDrawables(null,drawable,null,null);
+        drawable.setBounds(0, 0, 100, 100);
+        buttonIndexMy.setCompoundDrawables(null, drawable, null, null);
     }
 
     /**
      * 首页信息展示卡片的点击事件
      * 点击后显示详细信息
+     *
      * @param view 点击的view
      */
-    public void ShowMessage(View view){
+    public void ShowMessage(View view) {
         //获取到三个信息卡片的id
         relativeLayoutOne = findViewById(R.id.one);
         relativeLayoutTwo = findViewById(R.id.two);
         relativeLayoutThree = findViewById(R.id.three);
-        switch(view.getId()){
-            case R.id.one:{
+        switch (view.getId()) {
+            case R.id.one: {
                 //点击了第一个卡片信息
-                Log.i(log,"点击了第一个卡片信息");
+                Log.i(log, "点击了第一个卡片信息");
                 /**
                  * 点击信息卡片之后，跳转到详情页面
                  * 再详情页面重新加载
@@ -388,30 +399,30 @@ public class MainActivity extends AppCompatActivity
                 //数据携带对象
                 Bundle bundle = new Bundle();
                 //假定第一个信息卡片显示的信息的id为1
-                bundle.putInt("messageId",1);
-                Intent intent =  new Intent(MainActivity.this,ParticularActivity.class);
+                bundle.putInt("messageId", 1);
+                Intent intent = new Intent(MainActivity.this, ParticularActivity.class);
                 //放入跳转对象
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
             }
-            case R.id.two:{
+            case R.id.two: {
                 //点击了第二个卡片信息
                 Bundle bundle = new Bundle();
                 //假定第一个信息卡片显示的信息的id为2
-                bundle.putInt("messageId",2);
-                Intent intent =  new Intent(MainActivity.this,ParticularActivity.class);
+                bundle.putInt("messageId", 2);
+                Intent intent = new Intent(MainActivity.this, ParticularActivity.class);
                 //放入跳转对象
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
             }
-            case R.id.three:{
+            case R.id.three: {
                 //点击了第三个卡片信息
                 Bundle bundle = new Bundle();
                 //假定第一个信息卡片显示的信息的id为3
-                bundle.putInt("messageId",3);
-                Intent intent =  new Intent(MainActivity.this,ParticularActivity.class);
+                bundle.putInt("messageId", 3);
+                Intent intent = new Intent(MainActivity.this, ParticularActivity.class);
                 //放入跳转对象
                 intent.putExtras(bundle);
                 startActivity(intent);
@@ -425,12 +436,11 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         /*处理二维码扫描结果
-                */
+         */
 
 
-
-        switch (requestCode){
-            case REQUEST_CODE:{
+        switch (requestCode) {
+            case REQUEST_CODE: {
                 //处理扫描结果（在界面上显示）
                 if (null != data) {
                     Bundle bundle = data.getExtras();
@@ -438,17 +448,16 @@ public class MainActivity extends AppCompatActivity
                         return;
                     }
                     if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                        String jieGuo="http://www.feilonkji.xyz/";
+                        String jieGuo = "http://www.feilonkji.xyz/";
                         result = bundle.getString(CodeUtils.RESULT_STRING);//二维码解析结果
-                        if(result.equals(jieGuo)){
-                            Intent intent=new Intent(MainActivity.this,OpenLack.class);
+                        if (result.equals(jieGuo)) {
+                            Intent intent = new Intent(MainActivity.this, OpenLack.class);
                             startActivity(intent);
                         }
                         Toast.makeText(this, "解析结果:" + result, Toast.LENGTH_LONG).show();
                     } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                         Toast.makeText(MainActivity.this, "解析二维码失败", Toast.LENGTH_LONG).show();
-                    }
-                    else{
+                    } else {
                         Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -459,7 +468,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     //设置传递扫码结果集方法
-    public String chuanDi(){
+    public String chuanDi() {
         return result;
     }
 
@@ -497,13 +506,28 @@ public class MainActivity extends AppCompatActivity
         //判断点击了实验选项
         if (id == R.id.action_settings) {
             //点击后的事件
-            Toast.makeText(MainActivity.this,"功能还在开发中····",Toast.LENGTH_SHORT).show();
+
+//            threadPoolExecutor.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Bitmap bitmap = Connect.getConncet().getHeadPortrait();
+//                    Message msg = new Message();
+//                    msg.what = 2;
+//                    msg.obj = bitmap;
+//                    mainHandler.sendMessage(msg);
+//                }
+//            });
+
+            Toast.makeText(MainActivity.this, "功能还在开发中····", Toast.LENGTH_SHORT).show();
+//            Message message = new Message();
+//            message.what = 1;
+//            mainHandler.sendMessage(message);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -512,49 +536,49 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-         //判断点击了账户
+        //判断点击了账户
         if (id == R.id.nav_person) {
-            if(!logflag){
-                Intent intent=new Intent(MainActivity.this,LogInActivity.class);
+            if (!logflag) {
+                Intent intent = new Intent(MainActivity.this, LogInActivity.class);
                 startActivity(intent);
-            }else{
-                Toast.makeText(this,"账户已登录",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "账户已登录", Toast.LENGTH_SHORT).show();
             }
 
-           //判断点击了钱包
+            //判断点击了钱包
         } else if (id == R.id.nav_gallery) {
-            if(logflag==true){
-                Intent intent=new Intent(MainActivity.this,ChargeActivity.class);
+            if (logflag == true) {
+                Intent intent = new Intent(MainActivity.this, ChargeActivity.class);
                 startActivity(intent);
-            }else{
-                Toast.makeText(MainActivity.this,"请登录",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "请登录", Toast.LENGTH_SHORT).show();
             }
             //判断点击了信息
         } else if (id == R.id.nav_slideshow) {
-            if(logflag==true){
-                Intent intent=new Intent(MainActivity.this,MessageActivity.class);
+            if (logflag == true) {
+                Intent intent = new Intent(MainActivity.this, MessageActivity.class);
                 startActivity(intent);
-            }else{
-                Toast.makeText(MainActivity.this,"请登录",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "请登录", Toast.LENGTH_SHORT).show();
             }
             //判断点击了车位
         } else if (id == R.id.nav_manage) {
-            if(logflag==true){
-                Intent intent=new Intent(MainActivity.this,CarActivity.class);
+            if (logflag == true) {
+                Intent intent = new Intent(MainActivity.this, CarActivity.class);
                 startActivity(intent);
-            }else{
-                Toast.makeText(MainActivity.this,"请登录",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "请登录", Toast.LENGTH_SHORT).show();
             }
             //判断点击了注册
-        }else if(id == R.id.nav_register){
-            if(logflag==true){
-                Toast.makeText(MainActivity.this,"已登录，无法注册,请先退出登陆",Toast.LENGTH_SHORT).show();
-            }else{
-                Intent intent=new Intent(MainActivity.this,RegisterActivity.class);
+        } else if (id == R.id.nav_register) {
+            if (logflag == true) {
+                Toast.makeText(MainActivity.this, "已登录，无法注册,请先退出登陆", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
-        }else if(id == R.id.nav_shezhi){
-            Intent intent = new Intent(this,ShezhiActivity.class);
+        } else if (id == R.id.nav_shezhi) {
+            Intent intent = new Intent(this, ShezhiActivity.class);
             startActivity(intent);
         }
 
@@ -564,7 +588,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
     //图片方法初始
 
     /**
@@ -572,39 +595,62 @@ public class MainActivity extends AppCompatActivity
      */
     private void initEvent() {
         imageInfoList = new ArrayList<>();
-        /*
         threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
 
 
-                NewMessage NM1 = ct.newMessage(1);
-                NewMessage NM2 = ct.newMessage(2);
-                NewMessage NM3 = ct.newMessage(3);
-
-                if(null!=NM1.getMessageImage() &&null!=NM1.getMessageTitle()){
-                    imageInfoList.add(new ImageInfo(1, NM1.getMessageTitle(), NM1.getMessageImage(),"https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-                }
-                if(null!=NM2.getMessageImage() &&null!=NM2.getMessageTitle()){
-                    imageInfoList.add(new ImageInfo(2, NM2.getMessageTitle(), NM2.getMessageImage(), "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-                }
-                if(null!=NM3.getMessageImage() &&null!=NM3.getMessageTitle()){
-                    imageInfoList.add(new ImageInfo(3, NM1.getMessageTitle(), NM3.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-                }
-
+//                NewMessage NM1 = ct.newMessage(1);
+//                if (null != NM1.getMessageImage() && null != NM1.getMessageTitle() && null != NM1) {
+//                    imageInfoList.add(new ImageInfo(1, NM1.getMessageTitle(), NM1.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+//                }else{
+//                    imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+//                }
+//                NewMessage NM2 = ct.newMessage(2);
+//                if (null != NM2.getMessageImage() && null != NM2.getMessageTitle() && null != NM2) {
+//                    imageInfoList.add(new ImageInfo(2, NM2.getMessageTitle(), NM2.getMessageImage(), "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+//                }else{
+//                    imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+//                }
+//
+//                NewMessage NM3 = ct.newMessage(3);
+//                if (null != NM3.getMessageImage() && null != NM3.getMessageTitle() && null != NM3) {
+//                    imageInfoList.add(new ImageInfo(3, NM3.getMessageTitle(), NM3.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+//                }else{
+//                    imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+//                }
+//
+//                NewMessage NM4 = ct.newMessage(4);
+//                if (null != NM4.getMessageImage() && null != NM4.getMessageTitle() && null != NM4) {
+//                    imageInfoList.add(new ImageInfo(4, NM4.getMessageTitle(), NM4.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+//                }else{
+//                    imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
+//                }
+//
+//                NewMessage NM5 = ct.newMessage(5);
+//                if (null != NM5.getMessageImage() && null != NM5.getMessageTitle() && null != NM5) {
+//                    imageInfoList.add(new ImageInfo(5, NM5.getMessageTitle(), NM5.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+//                }else{
+//                    imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
+//                }
+//
+//                imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+//                imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+//                imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+//                imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
+//                imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
 
 
             }
         });
-        */
-
-                imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-                imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-                imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-                imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
-                imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
 
 
+        imageInfoList.add(new ImageInfo(1, "图片1，公告1", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+        imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+        imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+        imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
+        imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
+        imageStart();
 
     }
 
@@ -728,17 +774,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
     //6.0之后要动态获取权限，重要！！！
     protected void judgePermission() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[] {Manifest.permission.CAMERA}, 1);
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
             }
         }
-
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -786,12 +829,74 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-
-
         } else {
             //doSdCardResult();
         }
         //LocationClient.reStart();
+    }
+
+    /**
+     * 自定义静态handler，辅助threadPoolExecutor进行UI操作
+     */
+    public static class MainHandler extends Handler {        //必需设置为静态类防止内存泄露
+        private WeakReference<MainActivity> mWeakReference;
+
+        public MainHandler(MainActivity activity) {
+            mWeakReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            MainActivity mainActivity = mWeakReference.get();
+            switch (msg.what) {
+                case 1:
+//                    if (mainActivity != null) {
+//                        Log.i("Connect","handler receive message"+msg.what);
+////                         mainActivity.nav_imageview.setImageBitmap(HeadPortraitImage);
+//                        ImageView imageView = mainActivity.findViewById(R.id.nav_imageView);
+//                        imageView.setImageBitmap(HeadPortraitImage);
+//                        Log.i("Connect","change image successful");
+//                    }
+                    break;
+                case 2:
+                    if (mainActivity != null) {
+                        Log.i("Connect", "handler receive message" + msg.what);
+                        Bitmap bitmap = (Bitmap) msg.obj;
+                        ImageView imageView = mainActivity.findViewById(R.id.nav_imageView);
+                        imageView.setImageBitmap(bitmap);
+                        Log.i("Connect", "change image successful");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * 储存bitmap类型到本地储存
+     *
+     * @param bitmap   要储存的bitmap对象
+     * @param filename 储存的文件名
+     */
+    public void SaveBitmap(Bitmap bitmap, String filename) {
+        if (bitmap == null) {
+            return;
+        }
+        try {
+            File file = new File(getFilesDir().getPath());
+            File f = new File(file, filename);
+            f.createNewFile();
+            FileOutputStream fos = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            Log.i("Connect", "save HeadPortrait file successful");
+            sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

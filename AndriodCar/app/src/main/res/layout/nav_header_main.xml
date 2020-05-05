@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@mipmap/wode_touxiang" />
+        android:scaleType="fitCenter"
+        android:src="@mipmap/wode_touxiang" />
 
     <TextView
         android:id="@+id/logname"

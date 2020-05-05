@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -166,21 +167,26 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             touxiang_imagebutton.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
             Log.i("Connect","设置头像成功");
         }else{                                          //没有保存头像就获取
-            try {
-                MainActivity.HeadPortraitImage = Connect.getConncet().getHeadPortrait();
-                touxiang_imagebutton.setImageBitmap(MainActivity.HeadPortraitImage);
-                File file = new File(getFilesDir().getPath());          //保存头像
-                File f = new File(file, "head.PNG");
-                f.createNewFile();
-                FileOutputStream fos = new FileOutputStream(f);
-                MainActivity.HeadPortraitImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                fos.flush();
-                Log.i("Connect", "save HeadPortrait file successful");
-                sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
-                fos.close();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+            MainActivity.threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Bitmap bitmap = Connect.getConncet().getHeadPortrait();
+                        touxiang_imagebutton.setImageBitmap(bitmap);
+                        File file = new File(getFilesDir().getPath());          //保存头像
+                        File f = new File(file, "head.PNG");
+                        f.createNewFile();
+                        FileOutputStream fos = new FileOutputStream(f);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                        fos.flush();
+                        Log.i("Connect", "save HeadPortrait file successful");
+                        sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
+                        fos.close();
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
         Log.i("Connect","设置信息成功");
@@ -199,19 +205,23 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void run() {
                             try {
-                                Connect.getConncet().upHeadPortrait(bitmap);
+                                Connect.getConncet().upHeadPortrait(bitmap);            //从服务端获取头像文件
                                 touxiang_imagebutton.setImageBitmap(bitmap);
-                                MainActivity.HeadPortraitImage = bitmap;
-                                File file = new File(getFilesDir().getPath());
+                                Message message = new Message();
+                                message.what = 2;
+                                message.obj = bitmap;
+                                MainActivity.mainHandler.sendMessage(message);          //通知主活动更新UI
+                                File file = new File(getFilesDir().getPath());          //保存头像
                                 File f = new File(file, "head.PNG");
                                 f.createNewFile();
                                 FileOutputStream fos = new FileOutputStream(f);
                                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
                                 fos.flush();
+                                Thread.sleep(1000);
                                 Log.i("Connect", "save HeadPortrait file successful");
                                 sp_user.edit().putString("HeadPortraitPath",f.getPath()).apply();       //储存图片储存的路径
                                 fos.close();
-                            }catch (IOException e){
+                            }catch (IOException | InterruptedException e){
                                 e.printStackTrace();
                             }
                         }

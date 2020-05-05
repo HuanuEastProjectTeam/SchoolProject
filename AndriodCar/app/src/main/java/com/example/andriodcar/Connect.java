@@ -339,7 +339,10 @@ public class Connect {
         Msend = updata("newMessage",job);       //转换为字符串
         sendMessage(Msend);
         String reply = receiveMessage();    //获取服务器返回信息
-        NewMessage newMessage = JSON.parseObject(reply,NewMessage.class);       //转换为NewMessage JavaBean
+        NewMessage newMessage = new NewMessage();
+        if(reply != null && !reply.trim().equals("")){
+            newMessage = JSON.parseObject(reply,NewMessage.class);       //转换为NewMessage JavaBean
+        }
         return newMessage;
     }
 
@@ -347,6 +350,7 @@ public class Connect {
      * 获取当前账号头像
      */
     public Bitmap getHeadPortrait(){
+        Log.i(TAG,"start get HeadPortrait");
         JSONObject job = new JSONObject();
         job.put("name", String.valueOf(sp_user.getInt("PhoneNum",123)));            //获取保存在本地的账户名
         job.put("upHeadPortrait","2");

@@ -116,6 +116,9 @@ public class MainActivity extends AppCompatActivity
     // 图片数据，包括图片标题、图片链接、数据、点击要打开的网站（点击打开的网页或一些提示指令）
     private List<ImageInfo> imageInfoList;
 
+    //新闻表
+    public List<NewMessage> newMessageList;
+
     //二维码扫描
     private Button btn_sacn;
     //缴费
@@ -149,6 +152,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ct = Connect.getConncet();      //获取网络操作对象
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //标题为空
@@ -157,7 +161,6 @@ public class MainActivity extends AppCompatActivity
         //初始化权限
         judgePermission();
 
-        ct = Connect.getConncet();      //获取网络操作对象
         Connect.SetContext(this);
       /*
       首页信封图标点击事件
@@ -268,8 +271,21 @@ public class MainActivity extends AppCompatActivity
                     Looper.prepare();
                     showToast("自动登录成功");
                     logflag = true;
-
                     Looper.loop();
+
+
+                    Bitmap bitmap;
+                    bitmap = ct.getHeadPortrait();
+                    SaveBitmap(bitmap, "\"head.PNG\"");           //储存头像到本地
+                    if (bitmap != null) {
+                        Message message = new Message();
+                        message.what = 2;
+                        message.obj = bitmap;
+                        mainHandler.sendMessage(message);                   //传递UI更新操作给handler
+                        Log.i("Connect", "send message to handler");
+                    } else {
+                        Log.i("Connect", "no image find");
+                    }
                 } else {
                     Looper.prepare();
                     showToast("用户尚未登陆");
@@ -277,39 +293,13 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-            }
-        });
 
-        threadPoolExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap;
-                if (sp_user.getString("HeadPortraitPath", null) != null) {       //获取已经保存的头像路径
-                    File file = new File((sp_user.getString("HeadPortraitPath", null)));
-                    bitmap = BitmapFactory.decodeFile(file.getPath());
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Log.i("Connect", "读取到本地头像，载入完毕");
-                } else {                  //没有保存的头像则从云端获取
-                    bitmap = ct.getHeadPortrait();
-                    SaveBitmap(bitmap, "\"head.PNG\"");           //储存头像到本地
 
-                }
-                if (bitmap != null) {
-                    Message message = new Message();
-                    message.what = 2;
-                    message.obj = bitmap;
-                    mainHandler.sendMessage(message);                   //传递UI更新操作给handler
-                    Log.i("Connect", "send message to handler");
-                } else {
-                    Log.i("Connect", "no image find");
-                }
+
 
             }
         });
+
 
 
     }
@@ -380,11 +370,11 @@ public class MainActivity extends AppCompatActivity
      */
     public void ShowMessage(View view) {
         //获取到三个信息卡片的id
-        relativeLayoutOne = findViewById(R.id.one);
-        relativeLayoutTwo = findViewById(R.id.two);
-        relativeLayoutThree = findViewById(R.id.three);
+        relativeLayoutOne = findViewById(R.id.NewMessage_one);
+        relativeLayoutTwo = findViewById(R.id.NewMessage_two);
+        relativeLayoutThree = findViewById(R.id.NewMessage_three);
         switch (view.getId()) {
-            case R.id.one: {
+            case R.id.NewMessage_one: {
                 //点击了第一个卡片信息
                 Log.i(log, "点击了第一个卡片信息");
                 /**
@@ -406,7 +396,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
             }
-            case R.id.two: {
+            case R.id.NewMessage_two: {
                 //点击了第二个卡片信息
                 Bundle bundle = new Bundle();
                 //假定第一个信息卡片显示的信息的id为2
@@ -417,7 +407,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
             }
-            case R.id.three: {
+            case R.id.NewMessage_three: {
                 //点击了第三个卡片信息
                 Bundle bundle = new Bundle();
                 //假定第一个信息卡片显示的信息的id为3
@@ -507,21 +497,8 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             //点击后的事件
 
-//            threadPoolExecutor.execute(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Bitmap bitmap = Connect.getConncet().getHeadPortrait();
-//                    Message msg = new Message();
-//                    msg.what = 2;
-//                    msg.obj = bitmap;
-//                    mainHandler.sendMessage(msg);
-//                }
-//            });
 
             Toast.makeText(MainActivity.this, "功能还在开发中····", Toast.LENGTH_SHORT).show();
-//            Message message = new Message();
-//            message.what = 1;
-//            mainHandler.sendMessage(message);
 
             return true;
         }
@@ -595,11 +572,21 @@ public class MainActivity extends AppCompatActivity
      */
     private void initEvent() {
         imageInfoList = new ArrayList<>();
-        threadPoolExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
+        //先搞个假的
+        imageInfoList.add(new ImageInfo(1, "图片1，公告1", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
+        imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
+        imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
+        imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
+        imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
+        imageStart();
 
 
+//        //都收到后在调用一次初始化图片轮播的方法
+//        threadPoolExecutor.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//
 //                NewMessage NM1 = ct.newMessage(1);
 //                if (null != NM1.getMessageImage() && null != NM1.getMessageTitle() && null != NM1) {
 //                    imageInfoList.add(new ImageInfo(1, NM1.getMessageTitle(), NM1.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
@@ -634,23 +621,9 @@ public class MainActivity extends AppCompatActivity
 //                    imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
 //                }
 //
-//                imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-//                imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-//                imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-//                imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
-//                imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
-
-
-            }
-        });
-
-
-        imageInfoList.add(new ImageInfo(1, "图片1，公告1", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-        imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-        imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-        imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
-        imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
-        imageStart();
+//                imageStart();
+//            }
+//        });
 
     }
 

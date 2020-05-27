@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.TreeMap;
 
 public class Connect {
 
@@ -48,6 +49,9 @@ public class Connect {
     private static SharedPreferences sp_user;
     private static SharedPreferences.Editor editor_user;
 
+    public boolean isConnect = false;
+    public boolean ImageConncet = false;
+
 
 
 
@@ -62,7 +66,7 @@ public class Connect {
     }
 
     /**
-     * 初始化图片上传连接
+     * 初始化普通交互连接
      */
     private void InitConnect(){
         try {
@@ -70,8 +74,13 @@ public class Connect {
             din = new InputStreamReader(sc.getInputStream(),"gb2312");
             dout = sc.getOutputStream();
             sc.setSoTimeout(10000);
-            if(sc!=null){
-                Log.i(TAG,"connect image port successful");
+            if(sc!=null && din != null && dout != null){
+                isConnect = true;
+                Log.i(TAG,"connect server successful");
+            }else{
+                MainActivity.showToast("连接服务器失败");
+                Log.i(TAG,"connect server failed,now retry...");
+                InitConnect();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,7 +119,7 @@ public class Connect {
     /**
      * 初始化图片上传接口
      */
-    public boolean InitImageIO(){
+    public void InitImageIO(){
         try {
             ImageSocket = new Socket(ip,imageUploadPort);
             if(ImageSocket.isConnected()){
@@ -118,19 +127,18 @@ public class Connect {
                 if(imageFileOutputSteam != null){
                     imageInputStream = ImageSocket.getInputStream();
                     if(imageInputStream!=null){
+                        ImageConncet = true;
                         Log.i(TAG,"ImageIO Ready");
-                        return true;
                     }
                 }else{
                     Log.i(TAG,"imageOutputStream is null");
                 }
             }else{
-                Log.i(TAG,"image socket is null");
+                Log.i(TAG,"image socket init failed");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
     public void CloseImageIO(){
@@ -146,6 +154,7 @@ public class Connect {
             }
         }
         if(ImageSocket.isClosed()){
+            ImageConncet = false;
             Log.i(TAG,"ImageUpLoad Close");
         }
     }
@@ -157,13 +166,14 @@ public class Connect {
      */
     public boolean UploadImage(Bitmap image_toSend){
         try {
-            if(InitImageIO()){
+            InitImageIO();      //收发图片接口用完即关
+            if(ImageConncet){
                 Log.i(TAG,"start send image");
                 image_toSend.compress(Bitmap.CompressFormat.PNG, 100, imageFileOutputSteam);        //把图片按参数压缩后压入输出流
                 imageFileOutputSteam.flush();
                 Thread.sleep(1000);             //休眠一下线程等待传输完成
                 Log.i(TAG,"send image successful");
-                CloseConnect();
+                CloseImageIO();
                 return true;
             }else{
                 Log.i(TAG,"Init imageIO failed");
@@ -182,7 +192,8 @@ public class Connect {
     public Bitmap ReceiveImage(){
         Bitmap image_receive = null;
         try{
-            if(InitImageIO()){
+            InitImageIO();
+            if(ImageConncet){
                 try {
                     Thread.sleep(2000);     //发送获取头像申请后要等待服务端上传图片
                 }catch (InterruptedException e){
@@ -208,15 +219,20 @@ public class Connect {
     public void sendMessage(String message){
         InitConnect();      //发消息的时候连接服务器，收到消息后关闭
         try {
-            if(dout != null && message != null ){        //判断输出流或者消息是否为空，为空的话会产生nullpoint错误
-                message = message + "\n";       //末尾加上换行让服务器端有消息返回
-                byte[] me = message.getBytes();
-                dout.write(me);
-                dout.flush();
+            if(isConnect){
+                if(dout != null && message != null ){        //判断输出流或者消息是否为空，为空的话会产生nullpoint错误
+                    message = message + "\n";       //末尾加上换行让服务器端有消息返回
+                    byte[] me = message.getBytes();
+                    dout.write(me);
+                    dout.flush();
+                }else{
+                    Log.d("Connect","The message to be sent is empty or have no connect");
+                }
+                Log.i(TAG,"send message successful");
             }else{
-                Log.d("Connect","The message to be sent is empty or have no connect");
+                MainActivity.showToast("连接服务器失败");
+                Log.i(TAG,"no connect to send message");
             }
-            Log.i(TAG,"send message successful");
         } catch (IOException e) {
             Log.i(TAG,"send message to server failed");
             e.printStackTrace();
@@ -226,12 +242,17 @@ public class Connect {
     public String receiveMessage(){
         String message = "";
         try {
-            Log.i(TAG,"开始接收服务端信息");
-            char[] inMessage = new char[1024];
-            int a =din.read(inMessage);     //a存储返回消息的长度
-            Log.i(TAG,"reply length:"+a);
-            message = new String(inMessage,0,a);        //必须要用new string来转换
-            Log.i("Connect",message);
+            if(isConnect){
+                Log.i(TAG,"开始接收服务端信息");
+                char[] inMessage = new char[1024];
+                int a = din.read(inMessage);     //a存储返回消息的长度
+                Log.i(TAG,"reply length:"+a);
+                message = new String(inMessage,0,a);        //必须要用new string来转换
+                Log.i("Connect",message);
+            }else{
+                MainActivity.showToast("连接服务器失败");
+                Log.i(TAG,"no connect to receive message");
+            }
         } catch (IOException e) {
             Log.i(TAG,"receive message failed");
             e.printStackTrace();
@@ -299,7 +320,8 @@ public class Connect {
 
         String Msend = search("login",job); //用本类的search方法将json对象转换为json字符串
         sendMessage(Msend);
-        String reply = receiveMessage();    //获取服务器返回信息
+        String reply = "";
+        reply = receiveMessage();    //获取服务器返回信息
         JSONObject replyjob = null;
         if(reply!=null && !reply.equals("")){
             replyjob = JSONObject.parseObject(reply);
@@ -338,7 +360,8 @@ public class Connect {
         String Msend = "";
         Msend = updata("newMessage",job);       //转换为字符串
         sendMessage(Msend);
-        String reply = receiveMessage();    //获取服务器返回信息
+        String reply = "";
+        reply = receiveMessage();    //获取服务器返回信息
         NewMessage newMessage = new NewMessage();
         if(reply != null && !reply.trim().equals("")){
             newMessage = JSON.parseObject(reply,NewMessage.class);       //转换为NewMessage JavaBean
@@ -361,8 +384,8 @@ public class Connect {
         String Msend = "";
         Msend = updata("newMessage",job);       //转换为字符串
         sendMessage(Msend);
-        String reply = receiveMessage();    //获取服务器返回信息
-
+        String reply = "";
+        reply = receiveMessage();    //获取服务器返回信息
         Bitmap ReceiveImage = ReceiveImage();
         try {
             File file = new File(context.getFilesDir().getPath());
@@ -433,7 +456,8 @@ public class Connect {
 
         String Msend = updata("ediget",uo);
         sendMessage(Msend);
-        String reply = receiveMessage();    //获取服务器返回信息
+        String reply = "";
+        reply = receiveMessage();    //获取服务器返回信息
         Log.i("Connect","message received"+reply);
         JSONObject replyjob = null;
         if(reply!=null && !reply.equals("")){
@@ -472,7 +496,8 @@ public class Connect {
         String Msend = updata("updataPassword",uo);     //将jsonObject转换为String
 
         this.sendMessage(Msend);
-        String reply = this.receiveMessage();    //获取服务器返回信息
+        String reply = "";
+        reply = receiveMessage();    //获取服务器返回信息
         Log.i("Connect","message received"+reply);
         JSONObject replyjob = null;
         if(reply!=null && !reply.equals("")){
@@ -535,6 +560,7 @@ public class Connect {
         }catch (IOException e){
             e.printStackTrace();
         }
+        isConnect = false;
         Log.i(TAG,"关闭连接");
     }
 

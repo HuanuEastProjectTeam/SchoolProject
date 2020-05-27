@@ -232,7 +232,7 @@
                         android:background="@drawable/bnav_common_cp_refresh_button_selector"
                         android:layout_width="match_parent"
                         android:layout_height="140dp"
-                        android:id="@+id/one"
+                        android:id="@+id/NewMessage_one"
                         android:onClick="ShowMessage"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
@@ -287,11 +287,11 @@
                         android:background="@drawable/bnav_common_cp_refresh_button_selector"
                         android:layout_width="match_parent"
                         android:layout_height="140dp"
-                        android:id="@+id/two"
+                        android:id="@+id/NewMessage_two"
                         android:onClick="ShowMessage"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_below="@id/one">
+                        android:layout_below="@id/NewMessage_one">
                         <ImageButton
                             android:id="@+id/imgTwo"
                             android:layout_width="90dp"
@@ -341,11 +341,11 @@
                         android:background="@drawable/bnav_common_cp_refresh_button_selector"
                         android:layout_width="match_parent"
                         android:layout_height="140dp"
-                        android:id="@+id/three"
+                        android:id="@+id/NewMessage_three"
                         android:onClick="ShowMessage"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_below="@id/two">
+                        android:layout_below="@id/NewMessage_two">
                         <ImageButton
                             android:id="@+id/imgThree"
                             android:layout_width="90dp"

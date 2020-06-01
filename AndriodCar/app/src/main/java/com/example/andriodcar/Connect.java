@@ -27,7 +27,7 @@ public class Connect {
     private int imageUploadPort = 5423;
     private int port = 5422;
 
-    private static String TAG = "Connect";
+    public static final String TAG = "Connect";
 
     //传入一个context对象用于相关操作
     private static Context context;
@@ -246,6 +246,9 @@ public class Connect {
                 Log.i(TAG,"开始接收服务端信息");
                 char[] inMessage = new char[1024];
                 int a = din.read(inMessage);     //a存储返回消息的长度
+                if(a<=-1){
+                    return null;
+                }
                 Log.i(TAG,"reply length:"+a);
                 message = new String(inMessage,0,a);        //必须要用new string来转换
                 Log.i("Connect",message);
@@ -404,7 +407,7 @@ public class Connect {
     }
 
     /**
-     * 包装update操作类型json数据
+     * 包装update操作类型数据
      * 参数用法同search方法
      */
     public String updata(String type, Object source){

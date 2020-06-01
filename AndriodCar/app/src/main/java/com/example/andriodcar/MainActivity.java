@@ -83,6 +83,7 @@ import image.ImageCarousel;
 import image.ImageInfo;
 
 import com.example.andriodcar.Bean.Userbean;
+import com.uuzuche.lib_zxing.view.ViewfinderView;
 
 import utils.javautils;
 
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity
     private List<ImageInfo> imageInfoList;
 
     //新闻表
-    public List<NewMessage> newMessageList;
+    public static List<NewMessage> newMessageList;
 
     //二维码扫描
     private Button btn_sacn;
@@ -265,13 +266,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
 
-                ct.SetUserSharePreference(sp_user);         //传递sharepreference对象用于储存账号信息
+                Connect.SetUserSharePreference(sp_user);         //传递sharepreference对象用于储存账号信息
                 if (sp_user.getBoolean("logflag", false)) {
                     ct.login(String.valueOf(sp_user.getInt("PhoneNum", 123)), sp_user.getString("Password", "123"));       //登陆
                     Looper.prepare();
                     showToast("自动登录成功");
                     logflag = true;
-                    Looper.loop();
+                    //Looper.loop();        //加上无法完成接下来的图片更改操作
 
 
                     Bitmap bitmap;
@@ -292,11 +293,27 @@ public class MainActivity extends AppCompatActivity
                     Looper.loop();
                 }
 
-
-
-
-
-
+                //接收新闻信息
+                newMessageList = new ArrayList<>();
+                for(int i = 0;i<=1;i++){
+                    NewMessage newMessage = ct.newMessage(++i);
+                    if(newMessage!= null){
+                        newMessageList.add(newMessage);
+                        Log.i("Connect","接收到第"+i+"条新闻信息");
+                    }else{
+                        Log.i("Connect","接收第"+i+"条消息为空");
+                        break;
+                    }
+                }
+                runOnUiThread(new Runnable() {      //在view创建的线程才可以修改view，所以这个转到ui线程操作
+                    @Override
+                    public void run() {
+                        //通知handler刷新首页信息
+                        Message msg = new Message();
+                        msg.what = 3;
+                        mainHandler.handleMessage(msg);
+                    }
+                });
             }
         });
 
@@ -581,49 +598,7 @@ public class MainActivity extends AppCompatActivity
         imageStart();
 
 
-//        //都收到后在调用一次初始化图片轮播的方法
-//        threadPoolExecutor.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//
-//                NewMessage NM1 = ct.newMessage(1);
-//                if (null != NM1.getMessageImage() && null != NM1.getMessageTitle() && null != NM1) {
-//                    imageInfoList.add(new ImageInfo(1, NM1.getMessageTitle(), NM1.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-//                }else{
-//                    imageInfoList.add(new ImageInfo(1, "图片1，公告1", "","https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
-//                }
-//                NewMessage NM2 = ct.newMessage(2);
-//                if (null != NM2.getMessageImage() && null != NM2.getMessageTitle() && null != NM2) {
-//                    imageInfoList.add(new ImageInfo(2, NM2.getMessageTitle(), NM2.getMessageImage(), "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-//                }else{
-//                    imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
-//                }
-//
-//                NewMessage NM3 = ct.newMessage(3);
-//                if (null != NM3.getMessageImage() && null != NM3.getMessageTitle() && null != NM3) {
-//                    imageInfoList.add(new ImageInfo(3, NM3.getMessageTitle(), NM3.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-//                }else{
-//                    imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-//                }
-//
-//                NewMessage NM4 = ct.newMessage(4);
-//                if (null != NM4.getMessageImage() && null != NM4.getMessageTitle() && null != NM4) {
-//                    imageInfoList.add(new ImageInfo(4, NM4.getMessageTitle(), NM4.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-//                }else{
-//                    imageInfoList.add(new ImageInfo(1, "图片4，公告4", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did1", ""));
-//                }
-//
-//                NewMessage NM5 = ct.newMessage(5);
-//                if (null != NM5.getMessageImage() && null != NM5.getMessageTitle() && null != NM5) {
-//                    imageInfoList.add(new ImageInfo(5, NM5.getMessageTitle(), NM5.getMessageImage(), "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));
-//                }else{
-//                    imageInfoList.add(new ImageInfo(1, "图片5，公告5", "仅展示", "https://pic.sogou.com/d?query=%CD%A3%B3%B5%CD%BC%C6%AC&mode=1&did=2#did3", ""));
-//                }
-//
-//                imageStart();
-//            }
-//        });
+
 
     }
 
@@ -832,7 +807,7 @@ public class MainActivity extends AppCompatActivity
 //                        Log.i("Connect","change image successful");
 //                    }
                     break;
-                case 2:
+                case 2:     //更新主页头像
                     if (mainActivity != null) {
                         Log.i("Connect", "handler receive message" + msg.what);
                         Bitmap bitmap = (Bitmap) msg.obj;
@@ -840,6 +815,70 @@ public class MainActivity extends AppCompatActivity
                         imageView.setImageBitmap(bitmap);
                         Log.i("Connect", "change image successful");
                     }
+                    break;
+                case 3:     //更新主页新闻
+                    Log.i(Connect.TAG,"开始刷新新闻");
+                    NewMessage newMessage;
+                    TextView tvone = mainActivity.findViewById(R.id.oneTitle);
+                    TextView msgone = mainActivity.findViewById(R.id.oneMessage);
+                    if(newMessageList.size()-1<0){
+                        Log.i(Connect.TAG,"第一个新闻未收到");
+                        break;
+                    }
+                    newMessage = newMessageList.get(0);
+                    if(newMessage!=null){
+                        tvone.setText(newMessage.getMessageTitle());
+                        String m_string = newMessage.getMessageImage();
+                        if(m_string!=null){
+                            m_string = m_string.substring(0,10)+"...";
+                            msgone.setText(m_string);
+                            Log.i(Connect.TAG,"第一个新闻设置完成");
+                        }
+                    }else{
+                        Log.i(Connect.TAG,"第一个消息为空");
+                    }
+                    newMessage = null;
+
+                    TextView tvtwo = mainActivity.findViewById(R.id.twoTitle);
+                    TextView msgtwo = mainActivity.findViewById(R.id.twoMessage);
+                    if(newMessageList.size()-1<1){
+                        Log.i(Connect.TAG,"第二个新闻未收到");
+                        break;
+                    }
+                    newMessage = newMessageList.get(1);
+                    if(newMessage!=null){
+                        tvtwo.setText(newMessage.getMessageTitle());
+                        String m_string = newMessage.getMessageImage();
+                        if(m_string!=null){
+                            m_string = m_string.substring(0,10)+"...";
+                            msgtwo.setText(m_string);
+                            Log.i(Connect.TAG,"第二个新闻设置完成");
+                        }
+                    }else{
+                        Log.i(Connect.TAG,"第二个消息为空");
+                    }
+                    newMessage = null;
+
+                    TextView tvthree = mainActivity.findViewById(R.id.threeTitle);
+                    TextView msgthree = mainActivity.findViewById(R.id.threeMessage);
+                    if(newMessageList.size()-1<2){
+                        Log.i(Connect.TAG,"第三个新闻未收到");
+                        break;
+                    }
+                    newMessage = newMessageList.get(2);
+                    if(newMessage!=null){
+                        tvthree.setText(newMessage.getMessageTitle());
+                        String m_string = newMessage.getMessageImage();
+                        if(m_string!=null){
+                            m_string = m_string.substring(0,10)+"...";
+                            msgthree.setText(m_string);
+                            Log.i(Connect.TAG,"第三个新闻设置完成");
+                        }
+
+                    }else{
+                        Log.i(Connect.TAG,"第三个消息为空");
+                    }
+
                     break;
                 default:
                     break;

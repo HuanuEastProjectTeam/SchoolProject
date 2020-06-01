@@ -247,6 +247,7 @@
                             android:layout_marginLeft="20dp"
                             />
                         <TextView
+                            android:id="@+id/oneTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="德勤发布一份最新报告"
@@ -301,6 +302,7 @@
                             android:layout_marginLeft="20dp"
                             />
                         <TextView
+                            android:id="@+id/twoTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="德勤发布一份最新报告"
@@ -355,6 +357,7 @@
                             android:layout_marginLeft="20dp"
                             />
                         <TextView
+                            android:id="@+id/threeTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="德勤发布一份最新报告"

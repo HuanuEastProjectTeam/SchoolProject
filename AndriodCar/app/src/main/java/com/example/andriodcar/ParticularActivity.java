@@ -8,11 +8,14 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.andriodcar.Bean.NewMessage;
+
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ParticularActivity extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class ParticularActivity extends AppCompatActivity {
          *
          */
         //获取传递过来的信息id
-        String messageId = getIntent().getStringExtra("messageId");
+        int messageId = getIntent().getIntExtra("messageId",1);
         //根据id连接数据库进行查询信息
         /**
          * 此处查询信息处理
@@ -56,12 +59,8 @@ public class ParticularActivity extends AppCompatActivity {
          * 然后通过处理完的信息数据对像
          * 最终显示到页面
          */
-        //暂时不写改变
-//        textViewTitle.setText("");
-//        //获取图片路径
-//        Uri uri = Uri.parse("");
-//        imageViewImage.setImageURI(uri);
-//        textViewMessage.setText("");
-
+        NewMessage newMessage = MainActivity.newMessageList.get(messageId-1);
+        textViewTitle.setText(newMessage.getMessageTitle());
+        textViewMessage.setText(newMessage.getMessageImage());          //因为服务端错误导致内容在image变量中
     }
 }

@@ -23,13 +23,14 @@ import java.util.TreeMap;
 
 public class Connect {
 
+    //服务端地址及接口
     private String ip = "120.79.87.21";
-    private int imageUploadPort = 5423;
-    private int port = 5422;
+    private int imageUploadPort = 5423; //图片交互接口
+    private int port = 5422;    //普通交互接口
 
-    public static final String TAG = "Connect";
+    public static final String TAG = "Connect";     //网络连接调试TAG
 
-    //传入一个context对象用于相关操作
+    //传入一个context对象用于相关操作，一般都是主activity
     private static Context context;
 
     //普通数据交互接口
@@ -49,6 +50,7 @@ public class Connect {
     private static SharedPreferences sp_user;
     private static SharedPreferences.Editor editor_user;
 
+    //已连接标记
     public boolean isConnect = false;
     public boolean ImageConncet = false;
 
@@ -122,7 +124,7 @@ public class Connect {
     public void InitImageIO(){
         try {
             ImageSocket = new Socket(ip,imageUploadPort);
-            if(ImageSocket.isConnected()){
+            if(ImageSocket.isConnected()){      //判断是否已连接
                 imageFileOutputSteam = new DataOutputStream(ImageSocket.getOutputStream());
                 if(imageFileOutputSteam != null){
                     imageInputStream = ImageSocket.getInputStream();

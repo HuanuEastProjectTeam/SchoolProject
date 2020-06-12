@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
     // 图片数据，包括图片标题、图片链接、数据、点击要打开的网站（点击打开的网页或一些提示指令）
     private List<ImageInfo> imageInfoList;
 
-    //新闻表
+    //全局新闻列表，用于保存从服务端获取的新闻
     public static List<NewMessage> newMessageList;
 
     //二维码扫描
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ct = Connect.getConncet();      //获取网络操作对象
+        ct = Connect.getConncet();      //获取网络操作单例对象
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //标题为空
@@ -269,20 +269,24 @@ public class MainActivity extends AppCompatActivity
                 Connect.SetUserSharePreference(sp_user);         //传递sharepreference对象用于储存账号信息
                 if (sp_user.getBoolean("logflag", false)) {
                     ct.login(String.valueOf(sp_user.getInt("PhoneNum", 123)), sp_user.getString("Password", "123"));       //登陆
+                    //准备消息循环，必须将消息循环队列提到最前，才能在子线程中现实toast
                     Looper.prepare();
                     showToast("自动登录成功");
                     logflag = true;
                     //Looper.loop();        //加上无法完成接下来的图片更改操作
 
 
+                    //开始处理主界面头像
                     Bitmap bitmap;
+                    //从服务端获取头像
                     bitmap = ct.getHeadPortrait();
-                    SaveBitmap(bitmap, "\"head.PNG\"");           //储存头像到本地
+                    //储存头像到本地
+                    SaveBitmap(bitmap, "\"head.PNG\"");
                     if (bitmap != null) {
                         Message message = new Message();
                         message.what = 2;
                         message.obj = bitmap;
-                        mainHandler.sendMessage(message);                   //传递UI更新操作给handler
+                        mainHandler.sendMessage(message);                   //当图片不为空时，传递UI更新操作给handler
                         Log.i("Connect", "send message to handler");
                     } else {
                         Log.i("Connect", "no image find");
@@ -296,7 +300,9 @@ public class MainActivity extends AppCompatActivity
                 //接收新闻信息
                 newMessageList = new ArrayList<>();
                 for(int i = 0;i<=1;i++){
+                    //从服务端获取新闻
                     NewMessage newMessage = ct.newMessage(++i);
+                    //新闻对象不为空则添加进全局新闻列表
                     if(newMessage!= null){
                         newMessageList.add(newMessage);
                         Log.i("Connect","接收到第"+i+"条新闻信息");
@@ -305,6 +311,8 @@ public class MainActivity extends AppCompatActivity
                         break;
                     }
                 }
+
+                //更新view必须在创建view的线程中
                 runOnUiThread(new Runnable() {      //在view创建的线程才可以修改view，所以这个转到ui线程操作
                     @Override
                     public void run() {
@@ -819,17 +827,20 @@ public class MainActivity extends AppCompatActivity
                 case 3:     //更新主页新闻
                     Log.i(Connect.TAG,"开始刷新新闻");
                     NewMessage newMessage;
+                    //有机会可以替代为用循环完成，这样写没有任何拓展性
                     TextView tvone = mainActivity.findViewById(R.id.oneTitle);
                     TextView msgone = mainActivity.findViewById(R.id.oneMessage);
                     if(newMessageList.size()-1<0){
                         Log.i(Connect.TAG,"第一个新闻未收到");
                         break;
                     }
+                    //全局新闻列表序号从0开始，而新闻layout则是从1开始
                     newMessage = newMessageList.get(0);
                     if(newMessage!=null){
                         tvone.setText(newMessage.getMessageTitle());
                         String m_string = newMessage.getMessageImage();
                         if(m_string!=null){
+                            //超长就用省略号代替
                             m_string = m_string.substring(0,10)+"...";
                             msgone.setText(m_string);
                             Log.i(Connect.TAG,"第一个新闻设置完成");
@@ -837,6 +848,7 @@ public class MainActivity extends AppCompatActivity
                     }else{
                         Log.i(Connect.TAG,"第一个消息为空");
                     }
+                    //结束一次设置后必须设置临时新闻对象为空
                     newMessage = null;
 
                     TextView tvtwo = mainActivity.findViewById(R.id.twoTitle);
@@ -897,11 +909,16 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         try {
+            //创建临时文件
             File file = new File(getFilesDir().getPath());
             File f = new File(file, filename);
+            //无论如何都创建一个新的文件
             f.createNewFile();
+            //创建文件写入流
             FileOutputStream fos = new FileOutputStream(f);
+            //将目标文件转化为流
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            //写入
             fos.flush();
             Log.i("Connect", "save HeadPortrait file successful");
             sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径

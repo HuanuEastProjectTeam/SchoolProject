@@ -59,7 +59,7 @@ public class ParticularActivity extends AppCompatActivity {
          * 然后通过处理完的信息数据对像
          * 最终显示到页面
          */
-        NewMessage newMessage = MainActivity.newMessageList.get(messageId-1);
+        NewMessage newMessage = MainActivity.newMessageList.get(messageId-1);       //从获取保存在全局变量中的新闻信息
         textViewTitle.setText(newMessage.getMessageTitle());
         textViewMessage.setText(newMessage.getMessageImage());          //因为服务端错误导致内容在image变量中
     }

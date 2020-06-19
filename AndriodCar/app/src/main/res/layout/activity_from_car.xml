@@ -67,34 +67,6 @@
             android:layout_marginRight="5dp"
             android:background="@drawable/bnav_common_cp_refresh_button_selector"
             >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="50dp"
-                    android:id="@+id/carTwo"
-                    android:text="城市"
-                    android:gravity="center_vertical"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginRight="20dp"
-                    />
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:ems="8"
-                    android:background="@null"
-                    android:id="@+id/addressCar"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="省/市/区"
-                    />
-
-            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -171,17 +143,23 @@
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="20dp"
                     />
-                <EditText
+                <Spinner
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:ems="8"
-                    android:background="@null"
-                    android:id="@+id/startTime"
-                    />
+                    android:layout_height="match_parent"
+                    android:id="@+id/StarttimeHour"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="时/分"
+                    android:text="时"
+                    />
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/StarttimeMin"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="分"
                     />
             </LinearLayout>
             <TextView
@@ -204,17 +182,23 @@
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="20dp"
                     />
-                <EditText
+                <Spinner
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:ems="8"
-                    android:background="@null"
-                    android:id="@+id/endTime"
-                    />
+                    android:layout_height="match_parent"
+                    android:id="@+id/EndtimeHour"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="时/分"
+                    android:text="时"
+                    />
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/EndtimeMin"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="分"
                     />
             </LinearLayout>
             <TextView

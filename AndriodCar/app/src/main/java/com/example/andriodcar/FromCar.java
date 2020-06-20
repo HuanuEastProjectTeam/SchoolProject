@@ -56,7 +56,7 @@ public class FromCar extends AppCompatActivity {
                 EditText editText2 = findViewById(R.id.phoneNumber);
                 EditText editText5 = findViewById(R.id.moneyCar);
 
-                Spinner startTimeHourSpinner = findViewById(R.id.StarttimeHour);
+                final Spinner startTimeHourSpinner = findViewById(R.id.StarttimeHour);
                 Spinner startTimeMinSpinner = findViewById(R.id.StarttimeMin);
                 Spinner endTimeHourSpinner = findViewById(R.id.EndtimeHour);
                 Spinner endTimeMinSpinner = findViewById(R.id.EndtimeMin);
@@ -78,17 +78,17 @@ public class FromCar extends AppCompatActivity {
                 ArrayAdapter<String> MinListadapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, MinList);
                 MinListadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+                //加载适配器
                 startTimeHourSpinner.setAdapter(HourListadapter);
                 endTimeHourSpinner.setAdapter(HourListadapter);
-
                 startTimeMinSpinner.setAdapter(MinListadapter);
                 endTimeMinSpinner.setAdapter(MinListadapter);
 
                 //获取表单数据
                 String  carNumber = editText1.getText().toString();
                 String  phoneNumber = editText2.getText().toString();
-                String  startTime = "";
-                String  endTime = "00:00";
+                String  startTime = startTimeHourSpinner.getSelectedItem().toString()+":"+startTimeMinSpinner.getSelectedItem().toString();
+                String  endTime = endTimeHourSpinner.getSelectedItem().toString()+":"+endTimeMinSpinner.getSelectedItem().toString();
                 String  moneyCar = editText5.getText().toString();
                 if(carNumber.equals("")|| phoneNumber.equals("") || moneyCar.equals("")){
                     Toast.makeText(this,"请填写完整的信息",Toast.LENGTH_SHORT).show();

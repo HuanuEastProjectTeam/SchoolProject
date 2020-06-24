@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.mapframework.commonlib.utils.IO;
 import com.example.andriodcar.Bean.NewMessage;
+import com.example.andriodcar.Bean.PakingSpace;
 import com.example.andriodcar.Bean.UserOrdinary;
 
 
@@ -144,6 +145,9 @@ public class Connect {
     }
 
     public void CloseImageIO(){
+        if(ImageSocket==null){
+            return;
+        }
         if(ImageSocket.isConnected()){
             try {
                 ImageSocket.close();
@@ -392,20 +396,24 @@ public class Connect {
         String reply = "";
         reply = receiveMessage();    //获取服务器返回信息
         Bitmap ReceiveImage = ReceiveImage();
-        try {
-            File file = new File(context.getFilesDir().getPath());
-            File f = new File(file, "head.PNG");
-            f.createNewFile();
-            FileOutputStream fos = new FileOutputStream(f);
-            ReceiveImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.flush();
-            Log.i("Connect", "save HeadPortrait file successful");
-            sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
-            fos.close();
-        }catch (IOException e){
-            e.printStackTrace();
+        if(ReceiveImage == null){
+            return null;
+        }else{
+            try {
+                File file = new File(context.getFilesDir().getPath());
+                File f = new File(file, "head.PNG");
+                f.createNewFile();
+                FileOutputStream fos = new FileOutputStream(f);
+                ReceiveImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.flush();
+                Log.i("Connect", "save HeadPortrait file successful");
+                sp_user.edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
+                fos.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            return ReceiveImage;
         }
-        return ReceiveImage;
     }
 
     /**
@@ -548,8 +556,20 @@ public class Connect {
 
     }
 
-    public void FormCar(){
+    /*
+    *发布停车位
+     */
+    public void FormCar(PakingSpace pakingSpace){
+        String jsonStr = JSON.toJSONString(pakingSpace);
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+        jsonObject.put("name", String.valueOf(sp_user.getInt("PhoneNum",123)));
+        jsonObject.put("type","updata");
+        jsonObject.put("publishStall","1");
 
+        jsonStr = jsonObject.toJSONString();
+        sendMessage(jsonStr);
+        String reply = receiveMessage();
+        Log.i("Connect","message received"+reply);
     }
 
     /**

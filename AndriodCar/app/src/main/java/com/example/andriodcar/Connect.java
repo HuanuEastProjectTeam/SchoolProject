@@ -125,6 +125,7 @@ public class Connect {
     public void InitImageIO(){
         try {
             ImageSocket = new Socket(ip,imageUploadPort);
+            ImageSocket.setSoTimeout(10000);
             if(ImageSocket.isConnected()){      //判断是否已连接
                 imageFileOutputSteam = new DataOutputStream(ImageSocket.getOutputStream());
                 if(imageFileOutputSteam != null){
@@ -559,17 +560,17 @@ public class Connect {
     /*
     *发布停车位
      */
-    public void FormCar(PakingSpace pakingSpace){
+    public boolean FormCar(PakingSpace pakingSpace){
         String jsonStr = JSON.toJSONString(pakingSpace);
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
         jsonObject.put("name", String.valueOf(sp_user.getInt("PhoneNum",123)));
         jsonObject.put("type","updata");
-        jsonObject.put("publishStall","1");
+        jsonObject.put("publishStall",1);
 
-        jsonStr = jsonObject.toJSONString();
+        jsonStr = this.updata("publishStall",jsonObject);
         sendMessage(jsonStr);
         String reply = receiveMessage();
-        Log.i("Connect","message received"+reply);
+        return true;
     }
 
     /**

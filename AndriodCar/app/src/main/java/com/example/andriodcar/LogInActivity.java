@@ -74,25 +74,30 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                             if(ct.login(et_name.getText().toString(),et_password.getText().toString())){
                                 Looper.prepare();       //在子线程中使用toast
                                 Toast.makeText(LogInActivity.this,"登陆成功",Toast.LENGTH_SHORT).show();
-                                Bitmap bitmap = ct.getHeadPortrait();
-                                Message message = new Message();
-                                message.what = 2;
-                                message.obj = bitmap;
-                                mainHandler.sendMessage(message);
-                                try {
-                                    File file = new File(getFilesDir().getPath());          //保存头像
-                                    File f = new File(file, "head.PNG");
-                                    f.createNewFile();
-                                    FileOutputStream fos = new FileOutputStream(f);
-                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                                    fos.flush();
-                                    Thread.sleep(1000);
-                                    Log.i("Connect", "save HeadPortrait file successful");
-                                    getSharedPreferences("user", Context.MODE_PRIVATE).edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
-                                    fos.close();
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                                threadPoolExecutor.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            Bitmap bitmap = ct.getHeadPortrait();
+                                            Message message = new Message();
+                                            message.what = 2;
+                                            message.obj = bitmap;
+                                            mainHandler.sendMessage(message);
+                                            File file = new File(getFilesDir().getPath());          //保存头像
+                                            File f = new File(file, "head.PNG");
+                                            f.createNewFile();
+                                            FileOutputStream fos = new FileOutputStream(f);
+                                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                                            fos.flush();
+                                            Thread.sleep(1000);
+                                            Log.i("Connect", "save HeadPortrait file successful");
+                                            getSharedPreferences("user", Context.MODE_PRIVATE).edit().putString("HeadPortraitPath", f.getPath()).apply();       //储存图片储存的路径
+                                            fos.close();
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
                                 finish();
                                 Looper.loop();
                             }else{

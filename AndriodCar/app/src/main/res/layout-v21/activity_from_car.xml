@@ -147,8 +147,7 @@
                     android:id="@+id/StartTimePicker"
                     android:timePickerMode="spinner"
                     android:layout_width="wrap_content"
-                    android:layout_height="90dp"
-                    tools:targetApi="lollipop" />
+                    android:layout_height="90dp"/>
             </LinearLayout>
             <TextView
                 android:layout_width="match_parent"
@@ -174,8 +173,7 @@
                     android:id="@+id/EndTimePicker"
                     android:timePickerMode="spinner"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/navi_dimens_90dp"
-                    tools:targetApi="lollipop" />
+                    android:layout_height="@dimen/navi_dimens_90dp"/>
             </LinearLayout>
             <TextView
                 android:layout_width="match_parent"

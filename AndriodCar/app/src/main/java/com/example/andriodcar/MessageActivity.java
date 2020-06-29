@@ -171,8 +171,16 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public void run() {
                     try {
-                        Bitmap bitmap = Connect.getConncet().getHeadPortrait();
-                        touxiang_imagebutton.setImageBitmap(bitmap);
+                        final Bitmap bitmap = Connect.getConncet().getHeadPortrait();
+                        if(bitmap == null){
+                            return;
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                touxiang_imagebutton.setImageBitmap(bitmap);
+                            }
+                        });
                         File file = new File(getFilesDir().getPath());          //保存头像
                         File f = new File(file, "head.PNG");
                         f.createNewFile();

@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 android {
     // apache包
     useLibrary 'org.apache.http.legacy'
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         ndk {
             abiFilter 'armeabi'
@@ -14,8 +14,8 @@ android {
         // 导航SDK内部使用了annotationProcessor，需要添加下面代码，防止编译异常
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
         applicationId "com.example.andriodcar"
-        minSdkVersion 17
-        targetSdkVersion 26
+        minSdkVersion 23
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

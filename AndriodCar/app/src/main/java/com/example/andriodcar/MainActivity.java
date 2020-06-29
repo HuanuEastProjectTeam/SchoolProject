@@ -566,7 +566,7 @@ public class MainActivity extends AppCompatActivity
             //判断点击了车位
         } else if (id == R.id.nav_manage) {
             if (logflag == true) {
-                Intent intent = new Intent(MainActivity.this, CarActivity.class);
+                Intent intent = new Intent(MainActivity.this, FromCar.class);
                 startActivity(intent);
             } else {
                 Toast.makeText(MainActivity.this, "请登录", Toast.LENGTH_SHORT).show();
@@ -597,7 +597,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void initEvent() {
         imageInfoList = new ArrayList<>();
-        //先搞个假的
+        //先搞个用于演示的
         imageInfoList.add(new ImageInfo(1, "图片1，公告1", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did5", "http://www.cnblogs.com/luhuan/"));
         imageInfoList.add(new ImageInfo(1, "图片2，公告2", "", "https://pic.sogou.com/d?query=%BF%C6%BC%BC%CD%BC%C6%AC&mode=1&did=2#did31", "http://www.cnblogs.com/luhuan/"));
         imageInfoList.add(new ImageInfo(1, "图片3，公告3", "", "https://pic.sogou.com/d?query=%B5%C0%C2%B7%CD%BC%C6%AC&mode=1&did=1#did2", "http://www.cnblogs.com/luhuan/"));

@@ -13,6 +13,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.mapframework.commonlib.utils.IO;
 import com.example.andriodcar.Bean.NewMessage;
 import com.example.andriodcar.Bean.PakingSpace;
+import com.example.andriodcar.Bean.ResidenialQuarter;
+import com.example.andriodcar.Bean.ResidentialQuarter_Bean;
 import com.example.andriodcar.Bean.UserOrdinary;
 
 
@@ -20,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeMap;
 
 public class Connect {
@@ -297,7 +301,9 @@ public class Connect {
                     break;
                 case "creditScore": //信誉积分查询
                     break;
-                case "stall":   //个人车位查询
+                case "stall":   //车位查询
+                    Log.i(TAG,"开始编码stall内容");
+                    job.put("stall","1");
                     break;
                 case "help":    //帮助查询
                     break;
@@ -382,6 +388,56 @@ public class Connect {
     /**
      * 获取当前账号头像
      */
+
+    public List<ResidentialQuarter_Bean> Stall(){
+        //初始化对象与数据
+        List<ResidentialQuarter_Bean> StallList = new LinkedList<>();
+        JSONObject job = new JSONObject();  //创建一个json对象存放login信息
+        job.put("name",String.valueOf(sp_user.getInt("PhoneNum",123)));
+        job.put("password",sp_user.getString("Password",""));
+        job.put("stall","1");
+        job.put("type","search");
+        //网络交互数据
+        String Msend = search("stall",job); //用本类的search方法将json对象转换为json字符串
+        sendMessage(Msend);
+        String reply = "";
+        reply = receiveMessage();    //获取服务器返回信息
+        JSONObject replyjob = null;
+        //解析信息
+//        if(reply.equals("")) return StallList;
+        replyjob = JSONObject.parseObject(reply);
+        //创建测试数据
+        ResidentialQuarter_Bean s1=new ResidentialQuarter_Bean();
+        s1.setLongitude(28.18934);
+        s1.setLatitude(113.088875);
+        s1.setCommunityName("天霸地霸小区");
+        s1.setCommunityAddress("天王路一号");
+        s1.setId(1);
+        s1.setTotalNumPaks(24);
+        StallList.add(s1);
+
+        ResidentialQuarter_Bean s2=new ResidentialQuarter_Bean();
+        s2.setLongitude(28.189658);
+        s2.setLatitude(113.090564);
+        s2.setCommunityName("舞蹈小区");
+        s2.setCommunityAddress("蛇皮路二号");
+        s2.setId(2);
+        s2.setTotalNumPaks(15);
+        StallList.add(s2);
+
+        ResidentialQuarter_Bean s3=new ResidentialQuarter_Bean();
+        s3.setLongitude(28.188895);
+        s3.setLatitude(113.093486);
+        s3.setCommunityName("天天小区");
+        s3.setCommunityAddress("鄂武商路三号");
+        s3.setId(3);
+        s3.setTotalNumPaks(9);
+        StallList.add(s3);
+
+
+        return StallList;
+    }
+
     public Bitmap getHeadPortrait(){
         Log.i(TAG,"start get HeadPortrait");
         JSONObject job = new JSONObject();

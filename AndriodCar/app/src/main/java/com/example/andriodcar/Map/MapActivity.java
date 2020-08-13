@@ -2,6 +2,13 @@ package com.example.andriodcar.Map;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.location.Location;
 import android.os.Environment;
 import android.os.Handler;
@@ -72,6 +79,7 @@ import com.baidu.navisdk.adapter.IBNRoutePlanManager;
 import com.baidu.navisdk.adapter.IBNTTSManager;
 import com.baidu.navisdk.adapter.IBaiduNaviManager;
 import com.baidu.navisdk.adapter.impl.BaiduNaviManager;
+import com.example.andriodcar.Connect;
 import com.example.andriodcar.MainActivity;
 import com.example.andriodcar.R;
 
@@ -182,45 +190,52 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         orientationLoc();//调用方向传感数据实现方法
          //初始化集合对象
         startArrayList();
-        //调用创建覆盖物图标方法
-        overlayMapADdd(longiLatiTude);//longiLatiTude为小区地图覆盖物对象的集合对象
-
-        //覆盖物点击事件
-        mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+        //在子线程中进行网络请求
+        MainActivity.threadPoolExecutor.execute(new Runnable() {
             @Override
-            public boolean onMarkerClick(final Marker marker) {
-                /**
-                 * 点击了车库显示图标触发事件，然后显示该地区的车位使用情况
-                 */
+            public void run() {
+                longiLatiTude = Connect.getConncet().Stall();
+                //调用创建覆盖物图标方法
+                overlayMapADdd(longiLatiTude);//longiLatiTude为小区地图覆盖物对象的集合对象
 
-                Bundle bundle=marker.getExtraInfo();//获取携带的信息对象
-                int id=bundle.getInt("id");//获取覆盖物对应id
-                Log.i(LOG,""+id);
-                for(int i=0;i<longiLatiTude.size();i++){
-                    if(id==longiLatiTude.get(i).getId()){
-                        messageLayout=findViewById(R.id.MessageQu);
-                        textView_Name=findViewById(R.id.MessageKuang);//获取信息框控件
-                        textView_Num=findViewById(R.id.carNum);//获取车位余数控件
-                        textView_Num.setText("剩余空闲车位："+longiLatiTude.get(i).getTotalNumPaks()+"个");//显示余数
-                        textView_Name.setText(longiLatiTude.get(i).getCommunityName()+longiLatiTude.get(i).getCommunityAddress());//显示小区名字地址
-                        messageLayout.setVisibility(View.VISIBLE);//显示信息框
-                        textViewBiaoZhi=true;
-                        textView_Name.setOnClickListener(new View.OnClickListener() {//设置信息框的点击事件
-                            @Override
-                            public void onClick(View view) {
-                                /**
-                                 * 出现导航，指引用户前往地点
-                                 */
+                //覆盖物点击事件
+                mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(final Marker marker) {
+                        /**
+                         * 点击了车库显示图标触发事件，然后显示该地区的车位使用情况
+                         */
 
+                        Bundle bundle=marker.getExtraInfo();//获取携带的信息对象
+                        int id=bundle.getInt("id");//获取覆盖物对应id
+                        Log.i(LOG,""+id);
+                        for(int i=0;i<longiLatiTude.size();i++){
+                            if(id==longiLatiTude.get(i).getId()){
+                                messageLayout=findViewById(R.id.MessageQu);
+                                textView_Name=findViewById(R.id.MessageKuang);//获取信息框控件
+                                textView_Num=findViewById(R.id.carNum);//获取车位余数控件
+                                textView_Num.setText("剩余空闲车位："+longiLatiTude.get(i).getTotalNumPaks()+"个");//显示余数
+                                textView_Name.setText(longiLatiTude.get(i).getCommunityName()+longiLatiTude.get(i).getCommunityAddress());//显示小区名字地址
+                                messageLayout.setVisibility(View.VISIBLE);//显示信息框
+                                textViewBiaoZhi=true;
+                                textView_Name.setOnClickListener(new View.OnClickListener() {//设置信息框的点击事件
+                                    @Override
+                                    public void onClick(View view) {
+                                        /**
+                                         * 出现导航，指引用户前往地点
+                                         */
+
+                                    }
+                                });
                             }
-                        });
+                        }
+
+
+                        //  Toast.makeText(MapActivity.this, "点击了", Toast.LENGTH_LONG).show();
+                        baiduNaviGo(marker);
+                        return false;
                     }
-                }
-
-
-              //  Toast.makeText(MapActivity.this, "点击了", Toast.LENGTH_LONG).show();
-                baiduNaviGo(marker);
-                return false;
+                });
             }
         });
 
@@ -717,31 +732,33 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         //创建Maker坐标点
         LatLng point;
         OverlayOptions options,options1Text;//创建覆盖物对象
-
-/******************************测试数据*************************************************************/
-        ResidentialQuarter_Bean s1=new ResidentialQuarter_Bean();
-        s1.setLongitude(28.18934);
-        s1.setLatitude(113.088875);
-        s1.setCommunityName("天霸地霸小区");
-        s1.setCommunityAddress("天王路一号");
-        s1.setId(1);
-        longiLatiTude.add(s1);
-        ResidentialQuarter_Bean s2=new ResidentialQuarter_Bean();
-        s2.setLongitude(28.189658);
-        s2.setLatitude(113.090564);
-        s2.setCommunityName("舞蹈小区");
-        s2.setCommunityAddress("蛇皮路二号");
-        s2.setId(2);
-        longiLatiTude.add(s2);
-        ResidentialQuarter_Bean s3=new ResidentialQuarter_Bean();
-        s3.setLongitude(28.188895);
-        s3.setLatitude(113.093486);
-        s3.setCommunityName("天天小区");
-        s3.setCommunityAddress("鄂武商路三号");
-        s3.setId(3);
-        longiLatiTude.add(s3);
-
-   /***************************************************************************************/
+//
+///******************************测试数据*************************************************************/
+//        ResidentialQuarter_Bean s1=new ResidentialQuarter_Bean();
+//        s1.setLongitude(28.18934);
+//        s1.setLatitude(113.088875);
+//        s1.setCommunityName("天霸地霸小区");
+//        s1.setCommunityAddress("天王路一号");
+//        s1.setId(1);
+//        longiLatiTude.add(s1);
+//
+//        ResidentialQuarter_Bean s2=new ResidentialQuarter_Bean();
+//        s2.setLongitude(28.189658);
+//        s2.setLatitude(113.090564);
+//        s2.setCommunityName("舞蹈小区");
+//        s2.setCommunityAddress("蛇皮路二号");
+//        s2.setId(2);
+//        longiLatiTude.add(s2);
+//
+//        ResidentialQuarter_Bean s3=new ResidentialQuarter_Bean();
+//        s3.setLongitude(28.188895);
+//        s3.setLatitude(113.093486);
+//        s3.setCommunityName("天天小区");
+//        s3.setCommunityAddress("鄂武商路三号");
+//        s3.setId(3);
+//        longiLatiTude.add(s3);
+//
+//   /***************************************************************************************/
 
 
    /*************************************添加接收的小区对象到集合****************************************************/
@@ -772,9 +789,13 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                     .extraInfo(mBundle)//携带id信息便于点击事件的区分
                     .icon(bitmapDescriptor);
             //构建文本覆盖物
+//            options1Text=new TextOptions()
+//                    .position(pointMap.get(i))
+//                    .text("停车场")
+//                    .fontSize(24);
             options1Text=new TextOptions()
                     .position(pointMap.get(i))
-                    .text("停车场")
+                    .text("剩余车位:"+longiLatiTude.get(i).getTotalNumPaks())
                     .fontSize(24);
             //加入overlayOptions集合
             overlayOptions.add(options);
@@ -889,6 +910,45 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         public void onReceivePoi(BDLocation poiLocation) {
         }
     }
+
+    public static Bitmap drawTextToBitmap(Context gContext, String gText,Bitmap res) {
+        Resources resources = gContext.getResources();
+        float scale = resources.getDisplayMetrics().density;    //获取设备dpi
+        Bitmap bitmap = res;
+
+        android.graphics.Bitmap.Config bitmapConfig =
+                bitmap.getConfig();
+        // set default bitmap config if none
+        if(bitmapConfig == null) {
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;
+        }
+        // resource bitmaps are imutable,
+        // so we need to convert it to mutable one
+        bitmap = bitmap.copy(bitmapConfig, true);
+
+        Canvas canvas = new Canvas(bitmap);
+        // new antialised Paint
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        //设置字体颜色
+        paint.setColor(Color.rgb(61, 61, 61));
+        //换算字体大小到px
+        paint.setTextSize((int) (12 * scale));
+        //文本阴影
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE);
+
+        //绘制文本到canvas的中央位置
+        Rect bounds = new Rect();
+
+        paint.getTextBounds(gText, 0, gText.length(), bounds);
+        int x = (bitmap.getWidth() - bounds.width())/2;
+        int y = (bitmap.getHeight() + bounds.height())/2;
+
+        //绘制
+        canvas.drawText(gText, x , y , paint);
+
+        return bitmap;
+    }
+
 
     /**
      * 自定义定位图标，精度范围实现方法

@@ -1,5 +1,6 @@
 package com.example.andriodcar;
 
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import java.lang.reflect.Array;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -108,6 +110,12 @@ public class FromCar extends AppCompatActivity implements View.OnClickListener {
                     });
                     //发布成功给个提示
                     Toast.makeText(this,"发布成功",Toast.LENGTH_SHORT).show();
+                    Message msg = new Message();
+                    msg.what = 4;
+                    Calendar c = Calendar.getInstance();
+                    String msg_str = c.get(Calendar.HOUR_OF_DAY)+"."+c.get(Calendar.MINUTE)+":发布"+carNumber.toString()+"车位成功";
+                    msg.obj = msg_str;
+                    MainActivity.mainHandler.handleMessage(msg);   //添加消息至主页面
                 }
 
 

@@ -887,11 +887,17 @@ public class MainActivity extends AppCompatActivity
                             Log.i(Connect.TAG,"第三个新闻设置完成");
                         }
 
-                    }else{
-                        Log.i(Connect.TAG,"第三个消息为空");
+                    }else {
+                        Log.i(Connect.TAG, "第三个消息为空");
                     }
-
+                case 4:{        //添加消息
+                    LinearLayout MsgLayout = mainActivity.findViewById(R.id.myMessageLayout);
+                    String MsgToAdd = (String)msg.obj;
+                    TextView textView = new TextView(mainActivity);
+                    textView.setText(MsgToAdd);
+                    MsgLayout.addView(textView);
                     break;
+                }
                 default:
                     break;
             }
